@@ -1,0 +1,91 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>NEURAL NETWORK MODEL</title>
+
+        <script src="js/jquery.min.js"></script>
+        <script src="js/toastr.min.js"></script>
+        <script src="js/password.min.js"></script>
+        <script src="css/jqueryUI6/jquery-ui.theme.css"></script>
+        <script src="css/jqueryUI6/jquery-ui.theme.min.css"></script>
+
+        <link rel="stylesheet" href="css/pace-theme-minimal.css"></link>
+        <link rel="stylesheet" href="css/bootstrap.min.css"></link>
+        <link rel="stylesheet" href="css/metisMenu.min.css"></link>
+        <link rel="stylesheet" href="css/animate.min.css"></link>
+        <link rel="stylesheet" href="css/toastr.css"></link>
+        <link rel="stylesheet" href="css/font-awesome.min.css"></link>
+        <link rel="stylesheet" href="css/style(2).css"></link>
+        <link rel="stylesheet" href="css/theme-all.css"></link>
+        <link rel="stylesheet" href="css/login.css"></link>
+        <link rel="stylesheet" href="css/custom.css"></link>
+        <script type="text/javascript">
+            document.oncontextmenu = new Function("return false");
+        </script>
+
+    </h:head>
+    <h:body style="background-color: #ccccff">
+        
+        <div class="single-container login-screen animated fadeInDown" > 
+
+            <section class="sign-widget" >
+                <div class="body" >
+
+                    <div class="panel-heading" >
+                        
+                        
+                        
+                    </div>
+
+                    <h:form id="loginform"   styleClass="no-margin dp-wrapper">
+                        <p:messages closable="true"/>
+                        <fieldset>
+
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-user"></i>
+                                    </span>
+                                    <p:inputText autocomplete="off"  placeholder="user name" value="#{usersController.authUser.username}" required="true" requiredMessage="Enter Your User Name" styleClass="form-control" id="username"/>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-lock"></i>
+                                    </span>
+                                    <p:password autocomplete="off" placeholder="Password" value="#{usersController.authUser.password}" required="true" requiredMessage="Enter Your Password" styleClass="form-control"  id="password"/>
+                                </div>
+                            </div>
+
+                        </fieldset>
+
+                        <div class="form-actions">
+                            <p:commandButton  action="#{usersController.login()}" ajax="false"  iconPos="middle" styleClass="btn btn-block btn-primary"  value="Login">
+
+                            </p:commandButton>
+
+                            <br/>
+
+                          
+                        </div>
+                       
+                    </h:form>
+                </div>
+            </section>
+
+
+            <section>
+
+            </section>
+
+
+
+        </div>
+    </h:body>
+</html>
+

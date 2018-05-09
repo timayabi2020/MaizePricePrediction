@@ -1,0 +1,84 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:pe="http://primefaces.org/ui/extensions"
+      >
+    <ui:composition template="adminTemplate.xhtml">
+        <ui:define name="scripts">              
+        </ui:define>
+        <ui:define name="bedcrump">
+            <ol class="breadcrumb">
+                <li><a href="dashboard.nbk"><i class="fa fa-dashboard"></i> Home</a></li>
+                <li class="active">#</li>
+            </ol>
+        </ui:define>
+        <!-- Content Header (Page header) -->
+        <ui:define name="separator">
+            <h1>
+                
+                <small>MODEL CONFIGS</small>
+            </h1>           
+        </ui:define>
+
+        <ui:define name="adminContent">  
+             <h:form  id="regFRM">
+            <br/>
+            <h:panelGroup >
+                 <h:panelGrid  columns="4" cellpadding="5">
+                           <p:tabView dynamic="true" cache="true" >
+                           
+                                
+                    <p:messages style="width: 100%;" closable="true"/>
+               
+                        
+                          <p:tab title="EDIT MODEL CONFIGURATIONS">
+                          
+            
+        <p:dataTable value="#{usersController.modelDM}" var="model">
+            <p:column headerText="Maximum Iterations">
+                <h:outputText value="#{model.maxiterations}"/>
+            </p:column>
+            <p:column headerText="Training data (%)">
+                <h:outputText value="#{model.trainingdata}"/>
+            </p:column>
+            
+            <p:column headerText="Test data (%)">
+                <h:outputText value="#{model.testingdata}" />
+            </p:column>
+            
+            <p:column headerText="Learning rate ">
+                <h:outputText value="#{model.learningrate}" />
+            </p:column>
+            
+            <p:column headerText="Maximum Training Error ">
+                <h:outputText value="#{model.maxerror}" />
+            </p:column>
+            
+              <p:column headerText="Maximum Normalization Value ">
+                  <h:outputText value="#{model.normalizer}" />
+            </p:column>
+            
+               <p:column headerText="Actions">
+                <p:commandButton ajax="false" action="#{usersController.loadDetails()}" value="Edit Configs"/>
+                
+               </p:column>
+        </p:dataTable>
+    
+                              
+                          </p:tab>
+                           </p:tabView>
+                 </h:panelGrid>
+            </h:panelGroup>
+            </h:form>
+  </ui:define>
+        
+        
+        
+
+        
+    </ui:composition>
+</html>

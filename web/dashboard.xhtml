@@ -1,0 +1,141 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html  xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+	  <ui:composition template="adminTemplate.xhtml">
+
+        <ui:define name="scripts">
+            
+        </ui:define>
+        <!-- Content Header (Page header) -->
+        <ui:define name="separator">
+            <h1>
+             Dashboard
+               
+            </h1>
+        </ui:define>
+		<ui:define name="bedcrump">
+             <ol class="breadcrumb">
+            <li><a href="dashboard.nbk"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li class="active">#</li>
+           
+              
+          </ol>
+        </ui:define>
+        <br/>
+        <br/>
+
+        <ui:define name="adminContent">
+             <h:form id="regFRM">
+            <p:messages style="width: 100%;" closable="true"/>
+           <h:panelGrid  columns="2" cellpadding="5">
+              
+                          <p:tabView dynamic="true" cache="true" >
+                            
+                          <p:tab title="PREDICTIONS">
+                               
+                        
+                                   
+                       
+                         <h:panelGrid  columns="5" cellpadding="5">
+                             <h:outputLabel for="client" value="Select Region *"/>
+                             <p:selectOneMenu id="client" style="width: 250px" value="#{usersController.selectedregion}"> 
+                                    
+                              <f:selectItem  itemLabel="Select Maize Price Region" itemValue="0"/>
+                              <f:selectItem itemLabel="Nairobi" itemValue="NAIROBI"/>
+                              <f:selectItem itemLabel="Eldoret" itemValue="ELDORET"/>
+                              <f:selectItem itemLabel="Kisumu" itemValue="KISUMU"/>   
+                        </p:selectOneMenu>
+    
+                           <br />
+                               <h:outputLabel for="term" value="Select Month *"/>
+                                <p:calendar pattern="yyyy-MM" value="#{usersController.month}"/>
+                        <br />
+                         </h:panelGrid>
+                                    <h:panelGrid columns="1">
+                            <p:commandLink styleClass="btn bg-green margin" action="#{usersController.Predict()}" value="Predict"  update="regFRM,predictedval" />
+                          
+                     
+                                    <p:outputLabel id="predictedval" value="Predicted Value #{usersController.predictedvalue}" rendered="#{usersController.showpredictedvalue}"/>
+                         
+                                  </h:panelGrid>
+                              <h:panelGrid columns="1">
+                                  
+                                  <p:chart type="line" id="graph" model="#{usersController.createLineNrbModels()}" style="height:300px;width:1000px"/> 
+                                  
+                                  <p:dataTable value="#{usersController.nrbDM}" styleClass="fixed-size " var="model" id="results" paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {Exporters}"
+                            paginator="true" rows="6" widgetVar="reportTable">
+                              <f:facet name="{Exporters}">
+            <h:commandLink>
+                <img src="images/excel.png" width="24"/>
+                <p:dataExporter type="xls" target="tbl" fileName="Nairobi" />
+            </h:commandLink>
+ 
+            <h:commandLink>
+                <img src="images/pdf.png" width="24"/>
+                <p:dataExporter type="pdf" target="tbl" fileName="Nairobi"/>
+            </h:commandLink>
+ 
+        </f:facet>        
+            <p:column headerText="Month/Year">
+                <h:outputText value="#{model.date}"/>
+            </p:column>
+            <p:column headerText="Actual nominal maize price per kg">
+                <h:outputText value="Kshs #{model.data}"/>
+            </p:column>
+            <p:column headerText="Predicted nominal maize price per kg">
+                <h:outputText value=" Kshs #{model.predictedvalue}"/>
+            </p:column>
+            
+            
+            
+        </p:dataTable>
+                              </h:panelGrid>
+                                
+                                
+                               
+                             
+                           </p:tab>
+                           
+                           </p:tabView>
+                      </h:panelGrid>
+            <style type="text/css">
+.fixed-size {
+    table-layout: fixed;
+    word-wrap: break-word;
+    font-size: 12px;
+}
+.preformatted {
+    
+    font-size: 8px;
+    table-layout: auto;
+    word-wrap: break-word;
+}
+.xyz:hover {
+    background-color: white !important;
+  }
+</style>
+             </h:form>
+             <h:panelGrid columns="1" cellpadding="5">
+                 <p:dialog widgetVar="dlg4" modal='true' height="200" width="100" style="background: #ffbe0c" showHeader="false" position="center center" onShow="PF('dl4').initPosition()">
+                     
+                    
+                     <h:form>
+                         <p:outputLabel value="Predicted Value #{usersController.predictedvalue}"/>
+                     <center><p:commandLink styleClass="btn bg-green margin" value="Close" onclick = "PF('dlg4').hide();"/></center>
+                     </h:form>
+                     </p:dialog>
+             </h:panelGrid>
+                   
+         </ui:define>
+
+
+
+    </ui:composition>
+    
+
+</html>
+

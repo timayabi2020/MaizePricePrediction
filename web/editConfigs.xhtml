@@ -1,0 +1,76 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:pe="http://primefaces.org/ui/extensions"
+      >
+    <ui:composition template="adminTemplate.xhtml">
+        <ui:define name="scripts">              
+        </ui:define>
+        <ui:define name="bedcrump">
+            <ol class="breadcrumb">
+                <li><a href="dashboard.nbk"><i class="fa fa-dashboard"></i> Home</a></li>
+                <li class="active">#</li>
+            </ol>
+        </ui:define>
+        <!-- Content Header (Page header) -->
+        <ui:define name="separator">
+            <h1>
+                
+                <small>MODEL CONFIGS</small>
+            </h1>           
+        </ui:define>
+
+        <ui:define name="adminContent">  
+             <h:form  id="regFRM">
+            <br/>
+            <h:panelGroup >
+                 <h:panelGrid  columns="4" cellpadding="5">
+                           <p:tabView dynamic="true" cache="true" >
+                           
+                                
+                    <p:messages style="width: 100%;" closable="true"/>
+               
+                         <p:tab title="EDIT MODEL CONFIGURATIONS">
+                        <h:panelGrid  columns="4" cellpadding="5">
+                         
+                         
+                        
+                        <h:outputLabel for="maxiterations" value="Maximum iterations *"/>
+                        <p:inputText autocomplete="off" size="60" id="maxiterations" required="true" requiredMessage="Max Iterations is required !"  value="#{usersController.loadModel.maxiterations}" type="number"/>
+                        
+                        <h:outputLabel for="training" value="Training data (%)"/>
+                        <p:inputText autocomplete="off" size="60" id="training" required="true" requiredMessage="Training data is required !"  value="#{usersController.loadModel.trainingdata}" type="number"/> 
+                        
+                         <h:outputLabel for="test" value="Test data (%)"/>
+                         <p:inputText autocomplete="off" size="60" id="test" required="true" requiredMessage="Test data is required"  value="#{usersController.loadModel.testingdata}" type="number"/>
+                          
+                         <h:outputLabel for="learn" value="Learning rate"/>
+                         <p:inputText autocomplete="off" size="60" id="learn" required="true" requiredMessage="Learning rate is required"  value="#{usersController.loadModel.learningrate}" type="number"/>
+                        
+                        <h:outputLabel for="maxerror" value="Maximum training error"/>
+                        <p:inputText autocomplete="off" size="60" id="maxerror" required="true" requiredMessage="Maximum Training Error is required"  value="#{usersController.loadModel.maxerror}" type="number"/>
+                        
+                        <h:outputLabel for="maxnormalizer" value="Max normalization value"/>
+                        <p:inputText autocomplete="off" size="60" id="maxnormalizer" required="true" requiredMessage="Maximum normalization value"  value="#{usersController.loadModel.normalizer}" type="number"/>
+                        
+                        <p:commandLink styleClass="btn bg-green margin" onstart="PF('blockUIWidget').block()" oncomplete="PF('blockUIWidget').unblock()" value="Save"  action="#{usersController.editConfigs()}" update="regFRM"  process="@form" ajax="false" /> 
+                        </h:panelGrid>
+                         </p:tab>
+                    
+                          
+                           </p:tabView>
+                 </h:panelGrid>
+            </h:panelGroup>
+            </h:form>
+  </ui:define>
+        
+        
+        
+
+        
+    </ui:composition>
+</html>

@@ -1,0 +1,136 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:pe="http://primefaces.org/ui/extensions"
+      >
+    <ui:composition template="adminTemplate.xhtml">
+        <ui:define name="scripts">              
+        </ui:define>
+        <ui:define name="bedcrump">
+            <ol class="breadcrumb">
+                <li><a href="dashboard.nbk"><i class="fa fa-dashboard"></i> Home</a></li>
+                <li class="active">#</li>
+            </ol>
+        </ui:define>
+        <!-- Content Header (Page header) -->
+        <ui:define name="separator">
+            <h1>
+                
+                <small>MODEL TRAINING</small>
+            </h1>           
+        </ui:define>
+
+        <ui:define name="adminContent">  
+             <h:form  id="regFRM">
+            <br/>
+            <h:panelGroup >
+                 <h:panelGrid  columns="4" cellpadding="5">
+                           <p:tabView dynamic="true" cache="true" >
+                           
+                                
+                    <p:messages style="width: 100%;" closable="true"/>
+               
+                        
+                    
+                          <p:tab title="ANN MODEL TRAINING">
+                          
+                              <p:outputLabel value="Current model configurations"/>
+           <p:dataTable value="#{usersController.modelDM}" var="model">
+            <p:column headerText="Maximum Iterations">
+                <h:outputText value="#{model.maxiterations}"/>
+            </p:column>
+            <p:column headerText="Training data (%)">
+                <h:outputText value="#{model.trainingdata}"/>
+            </p:column>
+            
+            <p:column headerText="Test data (%)">
+                <h:outputText value="#{model.testingdata}" />
+            </p:column>
+            
+            <p:column headerText="Learning rate ">
+                <h:outputText value="#{model.learningrate}" />
+            </p:column>
+            
+            <p:column headerText="Maximum Training Error ">
+                <h:outputText value="#{model.maxerror}" />
+            </p:column>
+            
+              <p:column headerText="Maximum Normalization Value ">
+                  <h:outputText value="#{model.normalizer}" />
+            </p:column>
+        </p:dataTable>
+                              <br />
+                              <p:selectOneMenu id="client" style="width: 250px" value="#{usersController.selecteddata}"> 
+                                    
+                              <f:selectItem  itemLabel="Select Maize Price Region" itemValue="0"/>
+                              <f:selectItem itemLabel="Nairobi" itemValue="NAIROBI"/>
+                              <f:selectItem itemLabel="Eldoret" itemValue="ELDORET"/>
+                              <f:selectItem itemLabel="Kisumu" itemValue="KISUMU"/>   
+                        </p:selectOneMenu>
+    
+                           <br />
+                            <p:commandLink onclick ="PF('dlg3').show();" styleClass="btn bg-green margin" action="#{usersController.Train()}" value="Start Training"  update="regFRM,results,table" />
+                          <br />
+                          <h:panelGrid columns="1" id="table" rendered="#{usersController.renedered}">
+                          <h:panelGrid  columns="4" cellpadding="5">
+                              <p:outputLabel value="Total network error = #{usersController.totalnetworkError}"/>
+                              <p:outputLabel value="RMSE = #{usersController.rmse}"/>
+                              <p:outputLabel value="MAD  = #{usersController.madresult}"/>
+                          </h:panelGrid>
+                          
+                          <br />
+                          
+                          <p:outputLabel value="SELECTED TEST DATA RESULTS FOR #{usersController.selecteddata} REGION"/>
+                          <br />
+                          <p:commandLink styleClass="btn bg-yellow margin" value="View Graph" action="#{usersController.viewGraph()}" update ="graph,regFRM"/>
+                          <p:chart type="line" id="graph" model="#{usersController.createLineModels()}" style="height:400px;width:1000px" rendered="#{usersController.rendergraph}"/> 
+                          <br />
+                          <p:dataTable value="#{usersController.predsDM}" var="model" id="results">
+            <p:column headerText="Actual nominal maize price per kg">
+                <h:outputText value="Kshs #{model.actual}"/>
+            </p:column>
+            <p:column headerText="Predicted nominal maize price per kg">
+                <h:outputText value=" Kshs #{model.predicted}"/>
+            </p:column>
+            
+            <p:column headerText="Error">
+                <h:outputText value="#{model.error}" />
+            </p:column>
+            
+        </p:dataTable>
+                          </h:panelGrid>
+                          
+                          </p:tab>
+                           </p:tabView>
+                 </h:panelGrid>
+            </h:panelGroup>
+            </h:form>
+             <h:panelGrid columns="1" cellpadding="5">
+                 <p:dialog widgetVar="dlg3" modal='true' height="60" width="180" style="background: #ffbe0c" showHeader="false">
+                        <h:graphicImage value="images/ajax-loader_1.gif"  
+                                          style="vertical-align: middle;"/> 
+                        <h:outputText value="Please wait..." style="white-space: nowrap; font-family: sans-serif; color: #662200"/>
+                     </p:dialog>
+             </h:panelGrid>
+            
+            <h:panelGrid columns="1" cellpadding="5">
+                 <p:dialog widgetVar="dlg4" modal='true' height="450" width="650" style="background: #ffbe0c" showHeader="false" position="center center" onShow="PF('dl4').initPosition()">
+                     
+                     <p:chart type="line" model="#{usersController.createLineModels()}" style="height:400px;width:600px"/> 
+                     <h:form>
+                     <center><p:commandLink styleClass="btn bg-green margin" value="Close" onclick = "PF('dlg4').hide();"/></center>
+                     </h:form>
+                     </p:dialog>
+             </h:panelGrid>
+  </ui:define>
+        
+        
+        
+
+        
+    </ui:composition>
+</html>
