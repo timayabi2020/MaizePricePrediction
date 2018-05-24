@@ -56,7 +56,7 @@
                         <br />
                          </h:panelGrid>
                                     <h:panelGrid columns="1">
-                            <p:commandLink styleClass="btn bg-green margin" action="#{usersController.Predict()}" value="Predict"  update="regFRM,predictedval" />
+                            <p:commandLink styleClass="btn bg-green margin" action="#{usersController.Predict()}" value="Predict"  update="regFRM,predictedval,results,graph" />
                           
                      
                                     <p:outputLabel id="predictedval" value="Predicted Value #{usersController.predictedvalue}" rendered="#{usersController.showpredictedvalue}"/>
@@ -64,7 +64,7 @@
                                   </h:panelGrid>
                               <h:panelGrid columns="1">
                                   
-                                  <p:chart type="line" id="graph" model="#{usersController.createLineNrbModels()}" style="height:300px;width:1000px"/> 
+                                  <p:chart type="line" id="graph" model="#{usersController.createLineNrbModels()}" style="height:400px;width:1000px"/> 
                                   
                                   <p:dataTable value="#{usersController.nrbDM}" styleClass="fixed-size " var="model" id="results" paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {Exporters}"
                             paginator="true" rows="6" widgetVar="reportTable">

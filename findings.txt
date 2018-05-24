@@ -1,0 +1,119 @@
+Findings
+Iterations = 200000
+
+4,1,1,1
+======
+Neural Total network Error .536802
+Total RMSE  .681847
+MAD  .464915
+
+4,2,2,1
+======
+Neural Total network Error .338469
+Total RMSE  .281388
+MAD  .079179
+ 
+4,3,3,1
+=======
+Neural Total network Error .314045
+Total RMSE  .244838
+MAD  .059945
+
+
+4,4,4,1
+========
+Neural Total network Error .315785
+Total RMSE  .271243
+MAD  .073573
+
+4,5,5,1
+========
+Neural Total network Error .31675
+Total RMSE  .271752
+MAD  .073849
+
+4,6,6,1
+=========
+Neural Total network Error .317042
+Total RMSE  .263898
+MAD  .069642
+
+
+4,7,7,1
+=======
+Neural Total network Error .318227
+Total RMSE  .254016
+MAD  .064524
+
+4,8,8,1
+=======
+Neural Total network Error .318495
+Total RMSE  .251722
+MAD  .063364
+
+4,9,9,1
+=======
+Neural Total network Error .319672
+Total RMSE  .233664
+MAD  .054599
+
+4,10,10,1
+=========
+Neural Total network Error 0.3189476479836713
+Total RMSE  .22
+MAD  .05
+
+4,11,11,1
+=========
+Neural Total network Error .32
+Total RMSE  .17
+MAD  .03
+
+4,12,12,1
+=========
+Neural Total network Error .32
+ Total RMSE  .15
+ MAD  .02
+ 
+4,13,13,1
+=========
+Neural Total network Error .33
+Total RMSE  .12
+MAD  .01
+
+4,14,14,1
+=========
+Neural Total network Error .32
+Total RMSE  .08
+MAD  .01
+
+4,15,15,1
+=========
+Neural Total network Error .3226
+Total RMSE  .1032
+MAD  .0107
+
+
+4,16,16,1
+=========
+Neural Total network Error .3284
+Total RMSE  .0541
+MAD  .0029
+
+4,17,17, 1
+=========
+Neural Total network Error .3239
+Total RMSE  .0441
+MAD  .0019
+
+4,18,18, 1
+=========
+Neural Total network Error .330579
+Total RMSE  .002861
+MAD  .000008
+
+4,19,19, 1
+=========
+Neural Total network Error .32824
+Total RMSE  .002264
+MAD  .000005

@@ -82,7 +82,7 @@ public class UsersController {
      private String selectedregion;
      private String predictedvalue;
      private String showpredictedvalue;
-     private static DecimalFormat df2 = new DecimalFormat(".##");
+     private static DecimalFormat df2 = new DecimalFormat(".######");
       FacesContext ctx;
       @EJB
     private UsersFacade usersFacade = new UsersFacade();
@@ -286,7 +286,7 @@ public class UsersController {
                   
                    int maxIterations = loadModel.getMaxiterations();
                    
-                    NeuralNetwork neuralNet = new MultiLayerPerceptron(TransferFunctionType.SIGMOID,4, 6,1, 1);
+                    NeuralNetwork neuralNet = new MultiLayerPerceptron(TransferFunctionType.SIGMOID,4, 19,19, 1);
         ((LMS) neuralNet.getLearningRule()).setMaxError(loadModel.getMaxerror());//0-1
         ((LMS) neuralNet.getLearningRule()).setLearningRate(loadModel.getLearningrate());//0-1
         ((LMS) neuralNet.getLearningRule()).setMaxIterations(maxIterations);//0-1
@@ -392,7 +392,7 @@ public class UsersController {
                  loadedMlPerceptron.setInput(d1,d2,d3,d4);
                   loadedMlPerceptron.calculate();
                  System.out.print(" Predicted "+ df2.format((loadedMlPerceptron.getOutput().firstElement())*normolizer));
-                  error = (d5*normolizer) - ((loadedMlPerceptron.getOutput().firstElement())*normolizer);
+                  error =((loadedMlPerceptron.getOutput().firstElement())- (d5*normolizer)*normolizer);
                  System.out.println(" Error "+ df2.format(error));
                 
                  rmse =+ (error*error);

@@ -75,7 +75,7 @@ public class DAO {
           
              connection = GetDatabaseConnection.getMysqlConnection();
             stmt =  connection.createStatement();
-            String query ="SELECT ID,DATA FROM "+table;
+            String query ="SELECT ID,DATA FROM "+table + " ORDER BY 1 DESC ";
              preparedstatement = (PreparedStatement) connection.prepareStatement(query);
            
            
