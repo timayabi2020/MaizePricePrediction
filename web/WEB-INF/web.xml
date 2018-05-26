@@ -21,4 +21,8 @@
     <welcome-file-list>
         <welcome-file>index.nnet</welcome-file>
     </welcome-file-list>
+    <error-page>
+    <exception-type>javax.faces.application.ViewExpiredException</exception-type>
+    <location>/index.nnet</location>
+    </error-page>
 </web-app>

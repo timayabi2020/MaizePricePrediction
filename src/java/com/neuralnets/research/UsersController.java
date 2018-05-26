@@ -7,10 +7,14 @@ package com.neuralnets.research;
 
 import com.neuralnets.entities.Modelsettings;
 import com.neuralnets.entities.Nairobi;
+import com.neuralnets.entities.Research;
 import com.neuralnets.entities.Users;
 import com.neuralnets.facades.ModelsettingsFacade;
 import com.neuralnets.facades.NairobiFacade;
+import com.neuralnets.facades.ResearchFacade;
 import com.neuralnets.facades.UsersFacade;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import static java.lang.Math.sqrt;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -36,6 +40,10 @@ import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.neuroph.core.NeuralNetwork;
 import org.neuroph.core.learning.TrainingElement;
 import org.neuroph.core.learning.TrainingSet;
@@ -44,6 +52,7 @@ import org.neuroph.nnet.learning.BackPropagation;
 import org.neuroph.nnet.learning.LMS;
 import org.neuroph.util.TransferFunctionType;
 import org.primefaces.context.RequestContext;
+import org.primefaces.model.UploadedFile;
 import org.primefaces.model.chart.Axis;
 import org.primefaces.model.chart.AxisType;
 import org.primefaces.model.chart.LineChartModel;
@@ -58,6 +67,7 @@ import org.primefaces.model.chart.LineChartSeries;
 public class UsersController {
      private Users authUser = new Users();
      private Users loadUser = new Users();
+     private Research data = new Research();
      private Modelsettings model = new Modelsettings();
       private Modelsettings loadModel = new Modelsettings();
       private double minlevel = 0.0D;
@@ -82,6 +92,7 @@ public class UsersController {
      private String selectedregion;
      private String predictedvalue;
      private String showpredictedvalue;
+     private UploadedFile excelFile;
      private static DecimalFormat df2 = new DecimalFormat(".######");
       FacesContext ctx;
       @EJB
@@ -89,6 +100,9 @@ public class UsersController {
       
     @EJB
     private ModelsettingsFacade modelsettingsFacade = new ModelsettingsFacade();
+    
+    @EJB
+    private ResearchFacade dataFacade = new ResearchFacade();
     
     @EJB
     private NairobiFacade nrbFacade = new NairobiFacade();
@@ -392,7 +406,8 @@ public class UsersController {
                  loadedMlPerceptron.setInput(d1,d2,d3,d4);
                   loadedMlPerceptron.calculate();
                  System.out.print(" Predicted "+ df2.format((loadedMlPerceptron.getOutput().firstElement())*normolizer));
-                  error =((loadedMlPerceptron.getOutput().firstElement())- (d5*normolizer)*normolizer);
+                  //error =((loadedMlPerceptron.getOutput().firstElement())- (d5*normolizer)*normolizer);
+                  error = ((loadedMlPerceptron.getOutput().firstElement())*normolizer)-(d5*normolizer);
                  System.out.println(" Error "+ df2.format(error));
                 
                  rmse =+ (error*error);
@@ -900,5 +915,182 @@ public class UsersController {
           ex.printStackTrace();
         } 
     }
+     public String bulkUpload(){
+        ctx = FacesContext.getCurrentInstance();
+         String page = "bulkcreation.hub";
+         
+         FileInputStream fis = null;
+         String id="";
+         String year="";
+         String riceprice ="";
+         String wheatprice="";
+         String maizeprice="";
+         String maizeyield="";
+         String precipitation="";
+         String inflation="";
+         Date date = new Date();
+          ctx = FacesContext.getCurrentInstance();
+          rtx = RequestContext.getCurrentInstance();       
+        String[] fileInfo = {"0", "1", "2", "3", "4", "5", "6"};
+        
+        //Set selected cours
+        //String selected = students.getSelectedcourse();
+         //setSelectedCourse(selected);
+       // rtx.execute("PF('dlg1').show();");
+              System.out.println(excelFile.getContentType());
+              if(excelFile==null || !excelFile.getContentType().equalsIgnoreCase("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")){
+               ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Wrong file format. Only xlsx files accepted",""));   
+              }else{
+        try(InputStream input = excelFile.getInputstream()){
+           
+            //First read 
+             //Finds the workbook instance for XLSX file
+                XSSFWorkbook myWorkBook = new XSSFWorkbook(input);
+                //Return first sheet from the XLSX workbook
+                
+                int numberOfSheets = myWorkBook.getNumberOfSheets();
+                for (int i = 0; i < numberOfSheets; i++) {
+                XSSFSheet mySheet = myWorkBook.getSheetAt(i);
+                Iterator<Row> rowIterator = mySheet.iterator();
+                //Traversing over each row of XLSX file
+                while (rowIterator.hasNext()) {
+                    Row row = rowIterator.next();
+
+                    //For each row, iterate through each columns
+                    Iterator<Cell> cellIterator = row.cellIterator();
+
+                    // The most important content
+                    if (row.getRowNum() <= 0) {
+                        continue; //just skip the rows if row number is 0 with titles
+                    } else {
+                        //get file details and set them
+                         try {
+                            year = row.getCell(0).toString();
+                            //Put into the fileInfo Array index 0
+                            data.setYear(year);
+                            System.out.println("Admission number\t"
+                                    + year + "\n");
+                        } catch (Exception e) {
+                           data.setYear("not provided");
+                            System.out.println("Admission number not "
+                                    + "provided " + e.getMessage());
+                        }
+                         
+                         try {
+                            riceprice = row.getCell(1).toString();
+                            //Put into the fileInfo Array index 0
+                            data.setRiceprice(riceprice);
+                            System.out.println("riceprice\t"
+                                    + riceprice + "\n");
+                            
+                            
+                        } catch (Exception e) {
+                             data.setRiceprice("not provided");
+                            System.out.println("riceprice "
+                                    + "provided " + e.getMessage());
+                        }
+
+                        try {
+                            wheatprice = row.getCell(2).toString();
+                            //Put into the fileInfo Array index 0
+                            data.setWheatprice(wheatprice);
+                            System.out.println("wheatprice \t"
+                                    + wheatprice + "\n");
+                        } catch (Exception e) {
+                            data.setWheatprice("not provided");
+                            System.out.println("wheatprice "
+                                    + "provided " + e.getMessage());
+                        }
+                        
+                         try {
+                            maizeprice = row.getCell(3).toString();
+                            //Put into the fileInfo Array index 0
+                           data.setMaizeprice(maizeprice);
+                            System.out.println("maizeprice \t"
+                                    + maizeprice + "\n");
+                        } catch (Exception e) {
+                           data.setMaizeprice("not provided");
+                            System.out.println("maizeprice not "
+                                    + "provided " + e.getMessage());
+                        }
+                         
+                          try {
+                            maizeyield =row.getCell(4).toString();
+                            //Put into the fileInfo Array index 0
+                            data.setMaizeproduction(maizeyield);
+                            System.out.println("maizeyield \t"
+                                    + maizeyield + "\n");
+                        } catch (Exception e) {
+                            data.setMaizeproduction("not provided");
+                            System.out.println("maizeyield not "
+                                    + "provided " + e.getMessage());
+                        }
+                          
+                          try {
+                             inflation= row.getCell(5).toString();
+                            //Put into the fileInfo Array index 0
+                            data.setInflation(inflation);
+                            System.out.println("inflation \t"
+                                    + inflation + "\n");
+                        } catch (Exception e) {
+                            data.setInflation("not provided");
+                            System.out.println("inflation not "
+                                    + "provided " + e.getMessage());
+                        }
+                          
+                           try {
+                            precipitation = row.getCell(6).toString();
+                            //Put into the fileInfo Array index 0
+                           data.setRainfall(precipitation);
+                            System.out.println("precipitation \t"
+                                    + precipitation + "\n");
+                        } catch (Exception e) {
+                            data.setRainfall("not provided");
+                            System.out.println("precipitation not "
+                                    + "provided " + e.getMessage());
+                        }
+                          
+                       
+                        dataFacade.create(data);
+                        data = new Research();
+                        
+                        }
+                       // 
+                    
+                     
+                    }
+                   
     
+                 }
+          ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "File details successfully uploaded",""));
+            
+        }catch(Exception ex){
+           ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "An error occured on file upload",""));
+           ex.printStackTrace();
+        }
+              }
+        rtx.execute("PF('dlg1').hide();");
+         return page;
+     }
+
+    public UploadedFile getExcelFile() {
+        return excelFile;
+    }
+
+    public void setExcelFile(UploadedFile excelFile) {
+        this.excelFile = excelFile;
+    }
+
+    public Research getData() {
+        return data;
+    }
+
+    public void setData(Research data) {
+        this.data = data;
+    }
+     
+     
 }

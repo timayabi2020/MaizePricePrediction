@@ -1,0 +1,81 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:pe="http://primefaces.org/ui/extensions"
+      >
+    <ui:composition template="adminTemplate.xhtml">
+        <ui:define name="scripts">              
+        </ui:define>
+        <ui:define name="bedcrump">
+            <ol class="breadcrumb">
+                <li><a href="dashboard.nnet"><i class="fa fa-dashboard"></i> Home</a></li>
+                <li class="active">Bulk data creation</li>
+            </ol>
+        </ui:define>
+        <!-- Content Header (Page header) -->
+        <ui:define name="separator">
+            <h1>
+                
+                <small>Bulk upload</small>
+            </h1>           
+        </ui:define>
+
+        <ui:define name="adminContent">  
+            <br/>
+            <h:panelGroup >
+                 
+                <h:form  style="background-color:#ffffb3"  id="regFRM" enctype="multipart/form-data">
+                    
+                    <table style="background-color:#ffffb3">
+                       
+                         <h:panelGrid  columns="2" cellpadding="5">
+                             <p:tabView dynamic="true" cache="true" style="width: 1000px">
+                               
+                                <p:tab title="Bulk data upload">
+                                  <h:panelGrid style="color: #663300;font-size: 13px" columns="2" cellpadding="5">
+                                     
+                         
+                        
+                              
+                             
+                         
+                            <p:outputLabel for="upload" value="Bulk file upload" />
+                        <p:fileUpload value="#{usersController.excelFile}" id="upload" required="true" requiredMessage="Please upload sa file" mode="simple" skinSimple="true" allowTypes="/(\.|\/)(xlsx)$/"/>
+                         </h:panelGrid> 
+                      <h:panelGrid rendered="true"  style="position: relative;left:5%;" columns="2">
+                          <h:commandLink styleClass="btn bg-yellow margin" value="Save" style="position:relative;left:10%;"  onclick="PF('dlg1').show();" action="#{usersController.bulkUpload()}"  /> 
+                        
+                    </h:panelGrid> 
+                               </p:tab>
+                           </p:tabView>
+                         </h:panelGrid>
+
+                    <div style="clear: both"/>   
+
+                    
+                </table>
+                </h:form>
+                    
+                
+                
+                <p:dialog widgetVar="dlg1" modal="true" showHeader="false"> 
+                    <h:form id="showadmin">
+                            
+                            <h:panelGrid columns="2">  
+                            <h:graphicImage value="images/ajax-loader.gif"  
+                                            style="margin-right: 12px; vertical-align: middle;"/>  
+                            <h:outputText value="Uploading file please wait..." style="white-space: nowrap;"/>  
+                        </h:panelGrid> 
+                        
+                    </h:form>
+                    </p:dialog> 
+
+            </h:panelGroup>
+
+        </ui:define>
+    </ui:composition>
+</html>
