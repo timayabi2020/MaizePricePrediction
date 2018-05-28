@@ -79,6 +79,7 @@ public class UsersController {
      private DataModel<Users> usersDM = new ListDataModel<>();
      private DataModel<Modelsettings> modelDM = new ListDataModel<>();
      private List<Predictions> predsDM = new ArrayList<>();
+     private List<Research> researchDM = new ArrayList<>();
      private List<Nairobi> nrbDM = new ArrayList<>();
      HttpServletRequest request;
       private int maxCounter;
@@ -441,8 +442,229 @@ public class UsersController {
          
          return page;
     }
+    
+    public String TrainCountrywide(){
+           ctx = FacesContext.getCurrentInstance();
+           rtx = RequestContext.getCurrentInstance();
+         String page = "countrywide.nnet";
+         String networsavedstatename = "kenyaPerceptron.nnet";
+         
+         
+         try{
+            
+            
+                 loadModel = getModelDM().getRowData();
+                 System.out.println("This is the Max error "+ loadModel.getMaxiterations());
+                 double normolizer = loadModel.getNormalizer(); 
+                  DAO2 dao = new DAO2();
+                  dao.readNRBData();
+                  
+                   int maxIterations = loadModel.getMaxiterations();
+                   
+                    NeuralNetwork neuralNet = new MultiLayerPerceptron(TransferFunctionType.SIGMOID,5,22,22, 1);
+        ((LMS) neuralNet.getLearningRule()).setMaxError(loadModel.getMaxerror());//0-1
+        ((LMS) neuralNet.getLearningRule()).setLearningRate(loadModel.getLearningrate());//0-1
+        ((LMS) neuralNet.getLearningRule()).setMaxIterations(maxIterations);//0-1
+        //TrainingSet trainingSet = new TrainingSet();
+        TrainingSet trainingSet = dao.getTrainingSet();
+        
+         BackPropagation backPropagation = new BackPropagation();
+                 backPropagation.setMaxIterations(maxIterations);
+                 
+                 
+           neuralNet.learnInSameThread(trainingSet, backPropagation);
+          
+           
+        System.out.println("Neural Total network Error " + ((LMS)neuralNet.getLearningRule()).getTotalNetworkError());
+        double networkError = ((LMS)neuralNet.getLearningRule()).getTotalNetworkError();
+                 setTotalnetworkError(String.valueOf(df2.format(networkError)));
+        //System.out.println("Neural Total network Error " + neuralNet.getLearningRule());
+        // save trained neural network
+          neuralNet.save(networsavedstatename);
+          // load saved neural network
+         NeuralNetwork loadedMlPerceptron = NeuralNetwork.load(networsavedstatename);
+         HashMap hm = new HashMap();
+         Statement stmt = null; 
+        
+        PreparedStatement preparedstatement = null;
+        String values="";
+        String id = "";
+        Connection connection = null;
+        
+        int counter = 0;
+        int rowcount = 0;
+        String riceprice = "";
+        String wheatprice="";
+        String maizeprice="";
+        String maizeproduction="";
+        String rainfall="";
+        String inflation ="";
+         double error = 0.0;
+         double rmse = 0.0;
+         double sqrtrmse=0.0;
+         double mape = 0.0;
+        int maxCount = 0;
+         try {
+          
+             connection = GetDatabaseConnection.getMysqlConnection();
+            stmt =  connection.createStatement();
+            String query ="SELECT ID,MAIZEPRICE,INFLATION,MAIZEPRODUCTION,RAINFALL,RICEPRICE,WHEATPRICE FROM RESEARCH ORDER BY 1 DESC";
+             preparedstatement = (PreparedStatement) connection.prepareStatement(query);
+           
+           
+            
+            ResultSet result = preparedstatement.executeQuery();
+            
+            if (result.last()) {
+            rowcount = result.getRow();
+            result.beforeFirst(); // not rs.first() because the rs.next() below will move on, missing the first element
+            }
+            maxCount = (int)(loadModel.getTestingdata()*rowcount); 
+            System.out.println("full number of values = " + rowcount + " Percentage "+ maxCount/100); 
+           setMaxCounter(maxCount/100);
+            for(int i =0; i<rowcount; i++){
+               while(result.next()){
+                riceprice=result.getString("RICEPRICE");
+                inflation=result.getString("INFLATION");
+                rainfall=result.getString("RAINFALL");
+                maizeproduction=result.getString("MAIZEPRODUCTION");
+                wheatprice=result.getString("WHEATPRICE");
+                maizeprice=result.getString("MAIZEPRICE");
+                id = String.valueOf(result.getInt("ID"));
+                //for(int a=0; a<31;a ++){
+               
+                     double d1 = (Double.parseDouble(riceprice) - minlevel) / 100000;
+               //System.out.println("NORMALIZED "+d1 *normolizer + " REAL "+ riceprice);
+                double d2 = (Double.parseDouble(wheatprice) - minlevel) / 100000;
+                double d3 = (Double.parseDouble(maizeprice) - minlevel) / 100000;
+                double d4 = (Double.parseDouble(inflation) - minlevel) / 100;
+                double d5 = (Double.parseDouble(rainfall) - minlevel) / 1000;
+                double d6 = (Double.parseDouble(maizeproduction) - minlevel) / 100000;
+               
+                 System.out.print( "Actual"  + df2.format((d3*100000)));
+                 //testSet.addElement(new TrainingElement(new double[]{d1}));
+                 loadedMlPerceptron.setInput(d1,d2,d4,d5,d6);
+                  loadedMlPerceptron.calculate();
+                 System.out.print(" Predicted "+ df2.format((loadedMlPerceptron.getOutput().firstElement())*100000));
+                 updateCountryWide(df2.format((d3*100000)),df2.format((loadedMlPerceptron.getOutput().firstElement())*100000));
+                  //error =((loadedMlPerceptron.getOutput().firstElement())- (d5*normolizer)*normolizer);
+                  error = ((loadedMlPerceptron.getOutput().firstElement())*100000)-(d3*100000);
+                 System.out.println(" Error "+ df2.format(error));
+                
+                 rmse =+ (error*error);
+                // List output = null;
+                 //call function to add errors to list
+                 results(df2.format((d3*100000)),
+                         df2.format((loadedMlPerceptron.getOutput()
+                                 .firstElement())*100000),df2.format(error));
+                      
+               }   
+            }
+            
+             connection.close();
+        } catch (Exception ioe) {
+            System.out.println("Oops- an IOException happened.");
+            ioe.printStackTrace();
+            System.exit(1);
+        }
+      
+              setRenedered("true");
+             sqrtrmse=sqrt((rmse/rowcount));
+              System.out.println(" Total RMSE  "+ df2.format(sqrtrmse));
+                 setRmse(String.valueOf(df2.format(sqrtrmse)));
+              mape = (rmse/rowcount);
+                 setMadresult(String.valueOf(df2.format(mape)));
+                 
+              System.out.println(" MAD  "+ df2.format(mape));
+               setPredsDM(output);
+               
+               System.out.println("Final list count == > "+ output.size()); 
+             rtx.execute("PF('dlg3').hide()");
+              ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                            "Training was successful", ""));  
+             
+             
+         }catch(Exception e){
+              rtx.execute("PF('dlg3').hide()");
+              ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                            "An error occured, please try again", ""));
+         }
+         
+         return page;
+    }
    
     public String Predict(){
+         ctx = FacesContext.getCurrentInstance();
+         rtx = RequestContext.getCurrentInstance();
+        String page = "dashboard.nnet";
+        String networsavedstatename="";
+         try{
+            
+             if(selectedregion.equals("0")){
+              // rtx.execute("PF('dlg4').hide()");
+              ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, 
+                            "Please select region", ""));   
+             }else if(month == null){
+                  //rtx.execute("PF('dlg4').hide()");
+                ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, 
+                            "Please select date", ""));
+                //check if previous month has a value
+               
+             }else{
+                 System.out.println("I am checking previous month");
+               boolean check = CheckPreviousMonth(month,selectedregion);
+                if(check == false){
+                    System.out.println("I am checking previous month check fail ");
+                     //rtx.execute("PF('dlg4').hide()");
+                   ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, 
+                            "Previous month data is not available", ""));  
+                }else{
+                    System.out.println("I am checking previous month check success ");
+                    //Go ahead and predict
+                    if(selectedregion.equals("NAIROBI")){
+                     networsavedstatename = "nrbPerceptron.nnet";
+                 }else if(selectedregion.equals("ELDORET")){
+                    networsavedstatename = "eldPerceptron.nnet"; 
+                 }else{
+                    networsavedstatename = "ksmPerceptron.nnet"; 
+                 }
+                    NeuralNetwork loadedMlPerceptron = NeuralNetwork.load(networsavedstatename);
+                    
+                    //TrainingSet testSet = new TrainingSet();
+                    loadModel = getModelDM().getRowData();
+                    //testSet.addElement(new TrainingElement(new double[]{d1}));
+                    List d= getVars(month,selectedregion);
+//                    for(int i = 0; i<d.size();i++){
+//                    System.out.println("Value example "+d.get(i).toString());
+//                    }
+                  System.out.println("Value example "+d.get(1).toString() + " Example 2 "+d.get(2).toString());
+                 loadedMlPerceptron.setInput((Double.parseDouble(d.get(0).toString())- minlevel)/loadModel.getNormalizer()
+                         ,(Double.parseDouble(d.get(1).toString())- minlevel)/loadModel.getNormalizer(),
+                         (Double.parseDouble(d.get(2).toString())- minlevel)/loadModel.getNormalizer(),
+                         (Double.parseDouble(d.get(3).toString())- minlevel)/loadModel.getNormalizer());
+                
+                  loadedMlPerceptron.calculate();
+                  String predicted = String.valueOf(df2.format((loadedMlPerceptron.getOutput().firstElement())*loadModel.getNormalizer()));
+                 System.out.print(" Predicted "+predicted);
+                    setShowpredictedvalue("true");
+                    setPredictedvalue(predicted);
+                    
+                    //Do an update where that month = to that value
+                    updatePredictions(month,selectedregion,predicted);
+                    ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                            "Success", ""));  
+                }
+             }
+         }catch(Exception ex){
+              ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                            "Error occured", ""));  
+         }
+        return page;
+    }
+    
+    
+    
+     public String UpdateHistoricalPrediction(){
          ctx = FacesContext.getCurrentInstance();
          rtx = RequestContext.getCurrentInstance();
         String page = "dashboard.nnet";
@@ -661,7 +883,7 @@ public class UsersController {
       Axis y = lineModel.getAxis(AxisType.Y);
       y.setMin(5);
       y.setMax(50);
-      y.setLabel("Nominal Kshs Per Kg");
+      y.setLabel("Kshs Per Kg");
 
       Axis x = lineModel.getAxis(AxisType.X);
       x.setMin(0);
@@ -891,7 +1113,7 @@ public class UsersController {
 
     private void updatePredictions(Date month, String table, String predicted) {
         Statement stmt = null;
-       System.out.println("Updating table");
+       System.out.println("Updating table "+month + " Predicted vale "+ predicted + " Table "+ table);
       PreparedStatement preparedstatement = null;
        SimpleDateFormat format = new SimpleDateFormat("MMM-YY");
         String date = format.format(month);
@@ -1090,6 +1312,43 @@ public class UsersController {
 
     public void setData(Research data) {
         this.data = data;
+    }
+
+    public List<Research> getResearchDM() {
+        researchDM = dataFacade.findAll();
+        return researchDM;
+    }
+
+    public void setResearchDM(List<Research> researchDM) {
+        this.researchDM = researchDM;
+    }
+
+    private void updateCountryWide(String actual, String predicted) {
+       Statement stmt = null;
+       
+      PreparedStatement preparedstatement = null;
+       
+       
+        Connection connection = null;
+        
+         try{
+            connection = GetDatabaseConnection.getMysqlConnection();
+            stmt =  connection.createStatement();
+            String query ="UPDATE RESEARCH SET PREDICTEDVALUE = ? WHERE"
+                    + " MAIZEPRICE = ?";
+             preparedstatement = (PreparedStatement) connection.prepareStatement(query);
+            preparedstatement.setString(1,predicted);
+            preparedstatement.setString(2,actual);
+           
+            
+            preparedstatement.execute();
+            
+            
+            connection.close();
+        }catch(Exception ex){
+          ex.printStackTrace();
+        } 
+        
     }
      
      

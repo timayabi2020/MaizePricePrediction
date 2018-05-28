@@ -28,7 +28,7 @@
              <h:form  id="regFRM">
             <br/>
             <h:panelGroup >
-                 <h:panelGrid  columns="4" cellpadding="5">
+                 <h:panelGrid  columns="3" cellpadding="5">
                            <p:tabView dynamic="true" cache="true" >
                            
                                 
@@ -38,42 +38,12 @@
                     
                           <p:tab title="ANN MODEL TRAINING">
                           
-                              <p:outputLabel value="Current model configurations"/>
-           <p:dataTable value="#{usersController.modelDM}" var="model">
-            <p:column headerText="Maximum Iterations">
-                <h:outputText value="#{model.maxiterations}"/>
-            </p:column>
-            <p:column headerText="Training data (%)">
-                <h:outputText value="#{model.trainingdata}"/>
-            </p:column>
-            
-            <p:column headerText="Test data (%)">
-                <h:outputText value="#{model.testingdata}" />
-            </p:column>
-            
-            <p:column headerText="Learning rate ">
-                <h:outputText value="#{model.learningrate}" />
-            </p:column>
-            
-            <p:column headerText="Maximum Training Error ">
-                <h:outputText value="#{model.maxerror}" />
-            </p:column>
-            
-              <p:column headerText="Maximum Normalization Value ">
-                  <h:outputText value="#{model.normalizer}" />
-            </p:column>
-        </p:dataTable>
-                              <br />
-                              <p:selectOneMenu id="client" style="width: 250px" value="#{usersController.selecteddata}"> 
-                                    
-                              <f:selectItem  itemLabel="Select Maize Price Region" itemValue="0"/>
-                              <f:selectItem itemLabel="Nairobi" itemValue="NAIROBI"/>
-                              <f:selectItem itemLabel="Eldoret" itemValue="ELDORET"/>
-                              <f:selectItem itemLabel="Kisumu" itemValue="KISUMU"/>   
-                        </p:selectOneMenu>
+                              
+                            
+                              
     
-                           <br />
-                            <p:commandLink onclick ="PF('dlg3').show();" styleClass="btn bg-green margin" action="#{usersController.Train()}" value="Start Training"  update="regFRM,results,table" />
+                           
+                            <p:commandLink onclick ="PF('dlg3').show();" styleClass="btn bg-green margin" action="#{usersController.TrainCountrywide()}" value="Start Training"  update="regFRM,results,table" />
                           <br />
                           <h:panelGrid columns="1" id="table" rendered="#{usersController.renedered}">
                           <h:panelGrid  columns="4" cellpadding="5">
@@ -84,16 +54,15 @@
                           
                           <br />
                           
-                          <p:outputLabel value="SELECTED TEST DATA RESULTS FOR #{usersController.selecteddata} REGION"/>
+                          <p:outputLabel value="SELECTED TEST DATA RESULTS FOR THE WHOLE COUNTRY"/>
                           <br />
-                          <p:commandLink styleClass="btn bg-yellow margin" value="View Graph" action="#{usersController.viewGraph()}" update ="graph,regFRM"/>
-                          <p:chart type="line" id="graph" model="#{usersController.createLineModels()}" style="height:400px;width:1000px" rendered="#{usersController.rendergraph}"/> 
+                          
                           <br />
                           <p:dataTable value="#{usersController.predsDM}" var="model" id="results">
-            <p:column headerText="Actual maize price per kg">
+            <p:column headerText="Actual maize price per tonne">
                 <h:outputText value="Kshs #{model.actual}"/>
             </p:column>
-            <p:column headerText="Predicted maize price per kg">
+            <p:column headerText="Predicted maize price per tonne">
                 <h:outputText value=" Kshs #{model.predicted}"/>
             </p:column>
             
