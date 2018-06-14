@@ -1,0 +1,142 @@
+4-1-1
+Neural Total network Error .198552
+Total RMSE  5.028206
+Network  MAPE  11.789586
+Network  MAD  1.07658
+
+4-2-2-1
+Neural Total network Error .19703
+Total RMSE  3.992648
+Network  MAPE  10.224515
+Network  MAD  .894887
+
+4-3-3-1
+Neural Total network Error .197528
+Total RMSE  4.172875
+Network  MAPE  10.841006
+Network  MAD  .947438
+
+
+4-4-4-1
+Neural Total network Error .197729
+Total RMSE  3.542013
+Network  MAPE  8.873655
+Network  MAD  .778991
+
+4-5-5-1
+Total RMSE  4.018353
+Network  MAPE  10.377199
+Network  MAD  .908326
+
+4-6-6-1
+Total RMSE  3.494316
+Network  MAPE  8.755411
+Network  MAD  .769085
+
+4-7-7-1
+Total RMSE  3.651719
+Network  MAPE  9.210729
+Network  MAD  .807317
+
+4-8-8-1
+Total RMSE  3.690549
+Network  MAPE  9.341807
+Network  MAD  .818682
+
+4-9-9-1
+ Total RMSE  3.747183
+Network  MAPE  9.514424
+Network  MAD  .833815
+
+4-10-10-1
+Total RMSE  4.032047
+Network  MAPE  10.441012
+Network  MAD  .913523
+
+
+===========One layer=====
+4-17-1
+Total RMSE  3.323696
+Network  MAPE  8.293067
+Network  MAD  .730329
+4-16-1
+Total RMSE  3.284805
+Network  MAPE  8.187287
+Network  MAD  .721472
+
+4-15-1
+Total RMSE  3.190799
+Network  MAPE  7.93225
+Network  MAD  .699848
+
+4-14-1
+Total RMSE  3.225744
+Network  MAPE  8.026973
+Network  MAD  .707742
+
+4-13-1
+Total RMSE  3.111811
+Network  MAPE  7.698813
+Network  MAD  .680143
+
+4-12-1
+Total RMSE  3.153427
+Network  MAPE  7.829555
+Network  MAD  .690763
+
+4-11-1
+Total RMSE  3.026113
+Network  MAPE  7.445803
+Network  MAD  .658314
+
+4-10-1
+Total RMSE  3.188698
+Network  MAPE  7.926704
+Network  MAD  .699363
+
+
+4-9-1
+Total RMSE  3.175013
+Network  MAPE  7.883295
+Network  MAD  .695783
+
+4-8-1
+Total RMSE  3.118642
+Network  MAPE  7.725737
+Network  MAD  .68232
+
+4-7-1
+Total RMSE  3.348758
+Network  MAPE  8.372456
+Network  MAD  .737323
+
+4-6-1
+Total RMSE  3.143046
+Network  MAPE  7.805539
+Network  MAD  .689011
+
+4-5-1
+Total RMSE  3.266547
+Network  MAPE  8.150653
+Network  MAD  .71868
+
+4-4-1
+Total RMSE  3.851209
+Network  MAPE  9.110555
+Network  MAD  .82501
+
+4-3-1
+Total RMSE  3.908902
+Network  MAPE  9.39759
+Network  MAD  .84744
+
+
+4-2-1
+Total RMSE  3.962422
+Network  MAPE  9.676098
+Network  MAD  .868631
+
+4-1-1
+Total RMSE  4.303911
+Network  MAPE  10.907103
+Network  MAD  .968536

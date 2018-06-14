@@ -39,7 +39,8 @@
                           <p:tab title="ANN MODEL TRAINING">
                           
                               <p:outputLabel value="Current model configurations"/>
-           <p:dataTable value="#{usersController.modelDM}" var="model">
+           <p:dataTable value="#{usersController.modelDM}" var="model" >
+              
             <p:column headerText="Maximum Iterations">
                 <h:outputText value="#{model.maxiterations}"/>
             </p:column>
@@ -78,8 +79,9 @@
                           <h:panelGrid columns="1" id="table" rendered="#{usersController.renedered}">
                           <h:panelGrid  columns="4" cellpadding="5">
                               <p:outputLabel value="Total network error = #{usersController.totalnetworkError}"/>
-                              <p:outputLabel value="RMSE = #{usersController.rmse}"/>
                               <p:outputLabel value="MAD  = #{usersController.madresult}"/>
+                              <p:outputLabel value="MAPE  = #{usersController.maperesult}"/>
+                              <p:outputLabel value="RMSE = #{usersController.rmse}"/>
                           </h:panelGrid>
                           
                           <br />
@@ -89,16 +91,32 @@
                           <p:commandLink styleClass="btn bg-yellow margin" value="View Graph" action="#{usersController.viewGraph()}" update ="graph,regFRM"/>
                           <p:chart type="line" id="graph" model="#{usersController.createLineModels()}" style="height:400px;width:1000px" rendered="#{usersController.rendergraph}"/> 
                           <br />
-                          <p:dataTable value="#{usersController.predsDM}" var="model" id="results">
-            <p:column headerText="Actual maize price per kg">
+                          <p:dataTable value="#{usersController.predsDM}" var="model" id="results"  paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {Exporters}"
+                            paginator="true" rows="80" widgetVar="reportTable">
+                               <f:facet name="{Exporters}">
+            <h:commandLink>
+                <img src="images/excel.png" width="24"/>
+                <p:dataExporter type="xls" target="results" fileName="Nairobi" />
+            </h:commandLink>
+ 
+            <h:commandLink>
+                <img src="images/pdf.png" width="24"/>
+                <p:dataExporter type="pdf" target="results" fileName="Nairobi"/>
+            </h:commandLink>
+ 
+        </f:facet> 
+            <p:column headerText="Actual maize price">
                 <h:outputText value="Kshs #{model.actual}"/>
             </p:column>
-            <p:column headerText="Predicted maize price per kg">
+            <p:column headerText="Predicted maize price">
                 <h:outputText value=" Kshs #{model.predicted}"/>
             </p:column>
             
             <p:column headerText="Error">
                 <h:outputText value="#{model.error}" />
+            </p:column>
+            <p:column headerText="Mape">
+                <h:outputText value="#{model.mape}%" />
             </p:column>
             
         </p:dataTable>

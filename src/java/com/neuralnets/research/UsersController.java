@@ -90,11 +90,13 @@ public class UsersController {
      private String renedered;
      private String rendergraph;
      private Date month;
+     private String maperesult;
      private String selectedregion;
      private String predictedvalue;
      private String showpredictedvalue;
      private UploadedFile excelFile;
      private static DecimalFormat df2 = new DecimalFormat(".######");
+      private static DecimalFormat df3 = new DecimalFormat(".##");
       FacesContext ctx;
       @EJB
     private UsersFacade usersFacade = new UsersFacade();
@@ -301,7 +303,7 @@ public class UsersController {
                   
                    int maxIterations = loadModel.getMaxiterations();
                    
-                    NeuralNetwork neuralNet = new MultiLayerPerceptron(TransferFunctionType.SIGMOID,4, 19,19, 1);
+                    NeuralNetwork neuralNet = new MultiLayerPerceptron(TransferFunctionType.SIGMOID,4, 11, 1);
         ((LMS) neuralNet.getLearningRule()).setMaxError(loadModel.getMaxerror());//0-1
         ((LMS) neuralNet.getLearningRule()).setLearningRate(loadModel.getLearningrate());//0-1
         ((LMS) neuralNet.getLearningRule()).setMaxIterations(maxIterations);//0-1
@@ -388,6 +390,7 @@ public class UsersController {
          double rmse = 0.0;
          double sqrtrmse=0.0;
          double mape = 0.0;
+         double mad =0.0;
          TrainingSet testSet = new TrainingSet();
         
          for (int j = 0; j + 4 < valuesRow.length; j++) {
@@ -409,23 +412,30 @@ public class UsersController {
                  System.out.print(" Predicted "+ df2.format((loadedMlPerceptron.getOutput().firstElement())*normolizer));
                   //error =((loadedMlPerceptron.getOutput().firstElement())- (d5*normolizer)*normolizer);
                   error = ((loadedMlPerceptron.getOutput().firstElement())*normolizer)-(d5*normolizer);
-                 System.out.println(" Error "+ df2.format(error));
-                
-                 rmse =+ (error*error);
+                 System.out.print(" Error "+ df2.format(error));
+                 error = Double.parseDouble(df2.format(error));
+                 double actual = Double.parseDouble(df2.format(d5*normolizer));
+                 rmse+= (error*error);
+                 mad +=Math.abs(error);
+                  mape+=Math.abs(error/actual) *100;
+                  System.out.println(" MAPE "+ Math.abs(error/actual) *100);
+                 // double mad2 = (error/actual)*100;
                 // List output = null;
                  //call function to add errors to list
                  results(df2.format((d5*normolizer)),
                          df2.format((loadedMlPerceptron.getOutput()
-                                 .firstElement())*normolizer),df2.format(error));
+                                 .firstElement())*normolizer),String.valueOf(error),String.valueOf((error/actual)*100));
             }
               setRenedered("true");
              sqrtrmse=sqrt((rmse/valuesRow.length));
               System.out.println(" Total RMSE  "+ df2.format(sqrtrmse));
                  setRmse(String.valueOf(df2.format(sqrtrmse)));
-              mape = (rmse/valuesRow.length);
-                 setMadresult(String.valueOf(df2.format(mape)));
-                 
-              System.out.println(" MAD  "+ df2.format(mape));
+              mad = (mad/valuesRow.length);
+                 setMadresult(String.valueOf(df2.format(mad)));
+              mape = (mape/valuesRow.length); 
+              setMaperesult(String.valueOf(df2.format(mape)));
+              System.out.println(" MAD  "+ df2.format(mad));
+              System.out.println(" MAPE  "+ df2.format(mape));
                setPredsDM(output);
                
                System.out.println("Final list count == > "+ output.size()); 
@@ -503,6 +513,7 @@ public class UsersController {
          double rmse = 0.0;
          double sqrtrmse=0.0;
          double mape = 0.0;
+         double mad =0.0;
         int maxCount = 0;
          try {
           
@@ -521,9 +532,10 @@ public class UsersController {
             }
             maxCount = (int)(loadModel.getTestingdata()*rowcount); 
             System.out.println("full number of values = " + rowcount + " Percentage "+ maxCount/100); 
+            counter = maxCount/100;
            setMaxCounter(maxCount/100);
             for(int i =0; i<rowcount; i++){
-               while(result.next()){
+               if(result.next()){
                 riceprice=result.getString("RICEPRICE");
                 inflation=result.getString("INFLATION");
                 rainfall=result.getString("RAINFALL");
@@ -550,13 +562,16 @@ public class UsersController {
                   //error =((loadedMlPerceptron.getOutput().firstElement())- (d5*normolizer)*normolizer);
                   error = ((loadedMlPerceptron.getOutput().firstElement())*100000)-(d3*100000);
                  System.out.println(" Error "+ df2.format(error));
-                
-                 rmse =+ (error*error);
+                 mad +=Math.abs(error);
+                 error = Double.parseDouble(df2.format(error));
+                 double actual = Double.parseDouble(df2.format(d3*normolizer));
+                 mape+=Math.abs(error/actual) *100;
+                 rmse += (error*error);
                 // List output = null;
                  //call function to add errors to list
                  results(df2.format((d3*100000)),
                          df2.format((loadedMlPerceptron.getOutput()
-                                 .firstElement())*100000),df2.format(error));
+                                 .firstElement())*100000),df2.format(error),String.valueOf(mape));
                       
                }   
             }
@@ -569,13 +584,15 @@ public class UsersController {
         }
       
               setRenedered("true");
-             sqrtrmse=sqrt((rmse/rowcount));
+             sqrtrmse=sqrt((rmse/counter));
               System.out.println(" Total RMSE  "+ df2.format(sqrtrmse));
                  setRmse(String.valueOf(df2.format(sqrtrmse)));
-              mape = (rmse/rowcount);
-                 setMadresult(String.valueOf(df2.format(mape)));
-                 
-              System.out.println(" MAD  "+ df2.format(mape));
+              mape = (mape/counter);
+              mad = (mad/counter);
+                 setMadresult(String.valueOf(df2.format(mad)));
+                 setMaperesult(String.valueOf(df2.format(mape)));
+              System.out.println(" MAD  "+ df2.format(mad));
+               System.out.println(" MAD  "+ df2.format(mape));
                setPredsDM(output);
                
                System.out.println("Final list count == > "+ output.size()); 
@@ -647,7 +664,7 @@ public class UsersController {
                   String predicted = String.valueOf(df2.format((loadedMlPerceptron.getOutput().firstElement())*loadModel.getNormalizer()));
                  System.out.print(" Predicted "+predicted);
                     setShowpredictedvalue("true");
-                    setPredictedvalue(predicted);
+                    setPredictedvalue(String.valueOf(df3.format(Double.parseDouble(predicted))));
                     
                     //Do an update where that month = to that value
                     updatePredictions(month,selectedregion,predicted);
@@ -796,14 +813,14 @@ public class UsersController {
         this.setValuesRow(valuesRow);
     } 
 
-    public List<Predictions> results(String actual, String predicted, String error) {
+    public List<Predictions> results(String actual, String predicted, String error,String mape) {
       
-      
+      System.out.println("Setting training results");
       Predictions preds = new Predictions();
       preds.setActual(actual);
-      preds.setPredicted(predicted);
-      preds.setError(error);
-      
+      preds.setPredicted(String.valueOf(df3.format(Math.abs(Double.parseDouble(predicted)))));
+      preds.setError(String.valueOf(df3.format(Math.abs(Double.parseDouble(error)))));
+      preds.setMape(String.valueOf(df3.format(Math.abs(Double.parseDouble(mape)))));
       output.add(preds);
       
       return output;
@@ -915,7 +932,7 @@ public class UsersController {
       Axis y = lineModel.getAxis(AxisType.Y);
       y.setMin(5);
       y.setMax(50);
-      y.setLabel("Nominal Kshs Per Kg");
+      y.setLabel("Maize Price Kshs Per Kg");
 
       Axis x = lineModel.getAxis(AxisType.X);
       x.setMin(0);
@@ -1125,7 +1142,7 @@ public class UsersController {
             String query ="UPDATE "+table+" SET PREDICTEDVALUE = ? WHERE"
                     + " DATE = ?";
              preparedstatement = (PreparedStatement) connection.prepareStatement(query);
-            preparedstatement.setString(1,predicted);
+            preparedstatement.setString(1,String.valueOf(df3.format(Double.parseDouble(predicted))));
             preparedstatement.setString(2,date);
            
             
@@ -1323,6 +1340,14 @@ public class UsersController {
         this.researchDM = researchDM;
     }
 
+    public String getMaperesult() {
+        return maperesult;
+    }
+
+    public void setMaperesult(String maperesult) {
+        this.maperesult = maperesult;
+    }
+    
     private void updateCountryWide(String actual, String predicted) {
        Statement stmt = null;
        

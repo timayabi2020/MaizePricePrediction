@@ -13,6 +13,7 @@ public class Predictions {
     private String predicted;
     private String actual;
     private String error;
+    private String mape;
 
     public String getPredicted() {
         return predicted;
@@ -36,6 +37,14 @@ public class Predictions {
 
     public void setError(String error) {
         this.error = error;
+    }
+
+    public String getMape() {
+        return mape;
+    }
+
+    public void setMape(String mape) {
+        this.mape = mape;
     }
     
     
