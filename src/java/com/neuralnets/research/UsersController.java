@@ -314,7 +314,7 @@ public class UsersController {
                  backPropagation.setMaxIterations(maxIterations);
                  
                  
-           neuralNet.learnInSameThread(trainingSet, backPropagation);
+           neuralNet.learnInSameThread(trainingSet);
           
            
         System.out.println("Neural Total network Error " + ((LMS)neuralNet.getLearningRule()).getTotalNetworkError());
@@ -335,22 +335,24 @@ public class UsersController {
         
         int counter = 0;
         
-        
+        String date = "";
         
          try {
           
              connection = GetDatabaseConnection.getMysqlConnection();
             stmt =  connection.createStatement();
-            String query ="SELECT ID,DATA FROM "+selecteddata;
+            String query ="SELECT ID,DATE,DATA FROM "+selecteddata;
              preparedstatement = (PreparedStatement) connection.prepareStatement(query);
            
-           
+           String name = "\"1-02\"";
             
             ResultSet result = preparedstatement.executeQuery();
             while(result.next()){
                
                 values=result.getString("DATA");
                 id = String.valueOf(result.getInt("ID"));
+                date = result.getString("DATE");
+                System.out.println("\""+date +"\","+ values);
                 hm.put(id, values);
                counter = counter + 1;
             }
@@ -392,6 +394,7 @@ public class UsersController {
          double mape = 0.0;
          double mad =0.0;
          TrainingSet testSet = new TrainingSet();
+         
         
          for (int j = 0; j + 4 < valuesRow.length; j++) {
                 String s1 = valuesRow[j];
@@ -405,26 +408,32 @@ public class UsersController {
                 double d3 = (Double.parseDouble(s3) - minlevel) / normolizer;
                 double d4 = (Double.parseDouble(s4) - minlevel) / normolizer;
                 double d5 = (Double.parseDouble(s5) - minlevel) / normolizer;
-                System.out.print( "Actual"  + df2.format((d5*normolizer)));
+               // System.out.print( "Actual"  + df2.format((d5*normolizer)));
                  testSet.addElement(new TrainingElement(new double[]{d1}));
                  loadedMlPerceptron.setInput(d1,d2,d3,d4);
                   loadedMlPerceptron.calculate();
-                 System.out.print(" Predicted "+ df2.format((loadedMlPerceptron.getOutput().firstElement())*normolizer));
+               
+                 //System.out.print(" Predicted "+ df2.format((loadedMlPerceptron.getOutput().firstElement())*normolizer));
                   //error =((loadedMlPerceptron.getOutput().firstElement())- (d5*normolizer)*normolizer);
                   error = ((loadedMlPerceptron.getOutput().firstElement())*normolizer)-(d5*normolizer);
-                 System.out.print(" Error "+ df2.format(error));
+                 //System.out.print(" Error "+ df2.format(error));
                  error = Double.parseDouble(df2.format(error));
                  double actual = Double.parseDouble(df2.format(d5*normolizer));
                  rmse+= (error*error);
                  mad +=Math.abs(error);
                   mape+=Math.abs(error/actual) *100;
-                  System.out.println(" MAPE "+ Math.abs(error/actual) *100);
+                  //System.out.println(" MAPE "+ Math.abs(error/actual) *100);
+                   System.out.println("Actual"  + df2.format((d5*normolizer))+" Predicted "+ 
+                           df2.format((loadedMlPerceptron.getOutput()
+                                   .firstElement())*normolizer)+" Error "+ 
+                           df2.format(error)+" MAPE "+ Math.abs(error/actual) *100);
                  // double mad2 = (error/actual)*100;
                 // List output = null;
                  //call function to add errors to list
                  results(df2.format((d5*normolizer)),
                          df2.format((loadedMlPerceptron.getOutput()
-                                 .firstElement())*normolizer),String.valueOf(error),String.valueOf((error/actual)*100));
+                                 .firstElement())*normolizer),
+                         String.valueOf(error),String.valueOf((error/actual)*100));
             }
               setRenedered("true");
              sqrtrmse=sqrt((rmse/valuesRow.length));

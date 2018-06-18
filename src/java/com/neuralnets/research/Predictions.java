@@ -14,6 +14,7 @@ public class Predictions {
     private String actual;
     private String error;
     private String mape;
+    private String date;
 
     public String getPredicted() {
         return predicted;
@@ -45,6 +46,14 @@ public class Predictions {
 
     public void setMape(String mape) {
         this.mape = mape;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
     }
     
     
