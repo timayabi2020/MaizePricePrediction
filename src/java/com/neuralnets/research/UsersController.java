@@ -341,7 +341,7 @@ public class UsersController {
           
              connection = GetDatabaseConnection.getMysqlConnection();
             stmt =  connection.createStatement();
-            String query ="SELECT ID,DATE,DATA FROM "+selecteddata;
+            String query ="SELECT ID,DATE,DATA FROM "+selecteddata +" ORDER BY ID DESC LIMIT";
              preparedstatement = (PreparedStatement) connection.prepareStatement(query);
            
            String name = "\"1-02\"";
