@@ -23,6 +23,7 @@ public class Modelsettings implements Serializable {
     private int maxiterations;
     private double maxerror;
     private double normalizer;
+    private int neurons;
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -107,6 +108,14 @@ public class Modelsettings implements Serializable {
 
     public void setNormalizer(double normalizer) {
         this.normalizer = normalizer;
+    }
+
+    public int getNeurons() {
+        return neurons;
+    }
+
+    public void setNeurons(int neurons) {
+        this.neurons = neurons;
     }
     
 }

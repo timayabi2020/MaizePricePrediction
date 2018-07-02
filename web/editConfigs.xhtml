@@ -55,8 +55,10 @@
                         <p:inputText autocomplete="off" size="60" id="maxerror" required="true" requiredMessage="Maximum Training Error is required"  value="#{usersController.loadModel.maxerror}" type="number"/>
                         
                         <h:outputLabel for="maxnormalizer" value="Max normalization value"/>
-                        <p:inputText autocomplete="off" size="60" id="maxnormalizer" required="true" requiredMessage="Maximum normalization value"  value="#{usersController.loadModel.normalizer}" type="number"/>
+                        <p:inputText autocomplete="off" size="60" id="maxnormalizer" required="true" requiredMessage="Maximum normalization value required"  value="#{usersController.loadModel.normalizer}" type="number"/>
                         
+                        <h:outputLabel for="neurons" value="No of neurons"/>
+                        <p:inputText autocomplete="off" size="60" id="neurons" required="true" requiredMessage="No of neurons required"  value="#{usersController.loadModel.neurons}" type="number"/>
                         <p:commandLink styleClass="btn bg-green margin" onstart="PF('blockUIWidget').block()" oncomplete="PF('blockUIWidget').unblock()" value="Save"  action="#{usersController.editConfigs()}" update="regFRM"  process="@form" ajax="false" /> 
                         </h:panelGrid>
                          </p:tab>

@@ -309,7 +309,7 @@ public class UsersController {
                   
                    int maxIterations = loadModel.getMaxiterations();
                    
-                    NeuralNetwork neuralNet = new MultiLayerPerceptron(TransferFunctionType.SIGMOID,4, 8, 1);
+                    NeuralNetwork neuralNet = new MultiLayerPerceptron(TransferFunctionType.SIGMOID,4, loadModel.getNeurons(), 1);
         ((LMS) neuralNet.getLearningRule()).setMaxError(loadModel.getMaxerror());//0-1
         ((LMS) neuralNet.getLearningRule()).setLearningRate(loadModel.getLearningrate());//0-1
         ((LMS) neuralNet.getLearningRule()).setMaxIterations(maxIterations);//0-1
@@ -494,7 +494,7 @@ public class UsersController {
                   
                    int maxIterations = loadModel.getMaxiterations();
                    
-                    NeuralNetwork neuralNet = new MultiLayerPerceptron(TransferFunctionType.SIGMOID,8,9, 1);
+                    NeuralNetwork neuralNet = new MultiLayerPerceptron(TransferFunctionType.SIGMOID,8,loadModel.getNeurons(), 1);
         ((LMS) neuralNet.getLearningRule()).setMaxError(loadModel.getMaxerror());//0-1
         ((LMS) neuralNet.getLearningRule()).setLearningRate(loadModel.getLearningrate());//0-1
         ((LMS) neuralNet.getLearningRule()).setMaxIterations(maxIterations);//0-1
@@ -722,7 +722,7 @@ public class UsersController {
                  /*updateCountryWide(df2.format((d3*normolizer)/0.001),
                          df3.format((loadedMlPerceptron.getOutput().firstElement())*normolizer),df3.format(d3*normolizer));*/
                     setShowpredictedvalue("true");
-                    setPredictedvalue(String.valueOf(df3.format(((loadedMlPerceptron.getOutput().firstElement())/2)*normolizer)));
+                    setPredictedvalue(String.valueOf(df3.format(((loadedMlPerceptron.getOutput().firstElement())/1.88)*normolizer)));
                     
                     //Do an update where that month = to that value
                    // updatePredictions(month,selectedregion,predicted);
@@ -738,9 +738,19 @@ public class UsersController {
          }
         return page;
     }
-    
+    public String errorCheck(String predicted, String actual){
+        String value = "";
+        
+        double error = Double.parseDouble(predicted) - Double.parseDouble(actual);
+        
+        value = String.valueOf(df2.format(error));
+        //value = df2.format(value);
+        return value;
+        
+    }
     public void resetMultivariate(){
        data = new Research();  
+        setPredictedvalue(null);
     }
     public String Predict(){
          ctx = FacesContext.getCurrentInstance();

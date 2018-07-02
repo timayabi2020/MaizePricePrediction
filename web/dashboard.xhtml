@@ -52,9 +52,9 @@
                               <f:selectItem itemLabel="Medium" itemValue="2"/>
                               <f:selectItem itemLabel="High" itemValue="3"/>   
                         </h:selectOneMenu>
-                    <h:outputLabel for="wheat" value="Wheat price(Kshs/kg) *"/>
+                    <h:outputLabel for="wheat" value="Wheat price(Kshs/ton) *"/>
                     <p:inputText value="#{usersController.data.wheatprice}" required="true" id="wheat" type="number"/>
-                    <h:outputLabel for="rice" value="Rice price(Kshs/kg) *"/>
+                    <h:outputLabel for="rice" value="Rice price(Kshs/ton) *"/>
                     <p:inputText value="#{usersController.data.riceprice}" required="true" id="rice" type="number"/>
                     <h:outputLabel for="beans" value="Beans price(Kshs/kg) *"/>
                     <p:inputText value="#{usersController.data.beanprice}" required="true" id="beans" type="number"/>
@@ -103,6 +103,9 @@
             </p:column>
             <p:column headerText="Predicted maize price per kg">
                 <h:outputText value=" Kshs #{model.predictedvalue}"/>
+            </p:column>
+             <p:column headerText="Error">
+                 <h:outputText value=" Kshs #{usersController.errorCheck(model.predictedvalue,model.priceinkg)}"/>
             </p:column>
             
             

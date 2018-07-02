@@ -62,6 +62,10 @@
                   <h:outputText value="#{model.normalizer}" />
             </p:column>
             
+            <p:column headerText="No of neurons">
+                <h:outputText value="#{model.neurons}" />
+            </p:column>
+            
                <p:column headerText="Actions">
                 <p:commandButton ajax="false" action="#{usersController.loadDetails()}" value="Edit Configs"/>
                 
