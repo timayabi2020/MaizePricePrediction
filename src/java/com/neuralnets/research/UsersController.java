@@ -81,6 +81,7 @@ public class UsersController {
      private List<Predictions> predsDM = new ArrayList<>();
      private List<Research> researchDM = new ArrayList<>();
      private List<Nairobi> nrbDM = new ArrayList<>();
+     //private List<Research> nrbDM = new ArrayList<>();
      HttpServletRequest request;
       private int maxCounter;
      private String[] valuesRow;
@@ -94,6 +95,11 @@ public class UsersController {
      private String selectedregion;
      private String predictedvalue;
      private String showpredictedvalue;
+     private String selectedmode;
+     private String unirenedered;
+     private String multirendered;
+     private double normolizer2 = 100000.0D;
+    private double normolizer3 = 10000000.0D;
      private UploadedFile excelFile;
      private static DecimalFormat df2 = new DecimalFormat(".######");
       private static DecimalFormat df3 = new DecimalFormat(".##");
@@ -303,7 +309,7 @@ public class UsersController {
                   
                    int maxIterations = loadModel.getMaxiterations();
                    
-                    NeuralNetwork neuralNet = new MultiLayerPerceptron(TransferFunctionType.SIGMOID,4, 11, 1);
+                    NeuralNetwork neuralNet = new MultiLayerPerceptron(TransferFunctionType.SIGMOID,4, 8, 1);
         ((LMS) neuralNet.getLearningRule()).setMaxError(loadModel.getMaxerror());//0-1
         ((LMS) neuralNet.getLearningRule()).setLearningRate(loadModel.getLearningrate());//0-1
         ((LMS) neuralNet.getLearningRule()).setMaxIterations(maxIterations);//0-1
@@ -341,7 +347,7 @@ public class UsersController {
           
              connection = GetDatabaseConnection.getMysqlConnection();
             stmt =  connection.createStatement();
-            String query ="SELECT ID,DATE,DATA FROM "+selecteddata +" ORDER BY ID DESC LIMIT";
+            String query ="SELECT ID,DATE,DATA FROM "+selecteddata +" ORDER BY ID DESC";
              preparedstatement = (PreparedStatement) connection.prepareStatement(query);
            
            String name = "\"1-02\"";
@@ -466,7 +472,15 @@ public class UsersController {
            ctx = FacesContext.getCurrentInstance();
            rtx = RequestContext.getCurrentInstance();
          String page = "countrywide.nnet";
-         String networsavedstatename = "kenyaPerceptron.nnet";
+         String networsavedstatename = "";
+         
+         if(data.getPolitics().equals("1")){
+             networsavedstatename="kenyaPerceptron1.nnet";
+         }else if(data.getPolitics().equals("2")){
+           networsavedstatename="kenyaPerceptron2.nnet";  
+         }else{
+           networsavedstatename="kenyaPerceptron3.nnet";  
+         }
          
          
          try{
@@ -476,11 +490,11 @@ public class UsersController {
                  System.out.println("This is the Max error "+ loadModel.getMaxiterations());
                  double normolizer = loadModel.getNormalizer(); 
                   DAO2 dao = new DAO2();
-                  dao.readNRBData();
+                  dao.readNRBData(data.getPolitics());
                   
                    int maxIterations = loadModel.getMaxiterations();
                    
-                    NeuralNetwork neuralNet = new MultiLayerPerceptron(TransferFunctionType.SIGMOID,5,22,22, 1);
+                    NeuralNetwork neuralNet = new MultiLayerPerceptron(TransferFunctionType.SIGMOID,8,9, 1);
         ((LMS) neuralNet.getLearningRule()).setMaxError(loadModel.getMaxerror());//0-1
         ((LMS) neuralNet.getLearningRule()).setLearningRate(loadModel.getLearningrate());//0-1
         ((LMS) neuralNet.getLearningRule()).setMaxIterations(maxIterations);//0-1
@@ -518,17 +532,23 @@ public class UsersController {
         String maizeproduction="";
         String rainfall="";
         String inflation ="";
-         double error = 0.0;
-         double rmse = 0.0;
+         String beanprice="";
+        String maizeimport = "";
+        String politics = "";
+        List rmses = new ArrayList();
          double sqrtrmse=0.0;
+         double error = 0.0;
          double mape = 0.0;
-         double mad =0.0;
+         double mape1 = 0.0;
+         double rmse = 0.0;
+         double mad  =0.0;
+         List mapes = new ArrayList();
         int maxCount = 0;
          try {
           
              connection = GetDatabaseConnection.getMysqlConnection();
             stmt =  connection.createStatement();
-            String query ="SELECT ID,MAIZEPRICE,INFLATION,MAIZEPRODUCTION,RAINFALL,RICEPRICE,WHEATPRICE FROM RESEARCH ORDER BY 1 DESC";
+            String query ="SELECT ID,MAIZEPRICE,INFLATION,MAIZEPRODUCTION,RAINFALL,RICEPRICE,WHEATPRICE,MAIZEIMPORT,BEANPRICE,POLITICS FROM RESEARCH ORDER BY 1 DESC";
              preparedstatement = (PreparedStatement) connection.prepareStatement(query);
            
            
@@ -542,8 +562,9 @@ public class UsersController {
             maxCount = (int)(loadModel.getTestingdata()*rowcount); 
             System.out.println("full number of values = " + rowcount + " Percentage "+ maxCount/100); 
             counter = maxCount/100;
+            //counter = rowcount;
            setMaxCounter(maxCount/100);
-            for(int i =0; i<rowcount; i++){
+            for(int i =0; i<counter; i++){
                if(result.next()){
                 riceprice=result.getString("RICEPRICE");
                 inflation=result.getString("INFLATION");
@@ -552,35 +573,46 @@ public class UsersController {
                 wheatprice=result.getString("WHEATPRICE");
                 maizeprice=result.getString("MAIZEPRICE");
                 id = String.valueOf(result.getInt("ID"));
+                maizeimport=result.getString("MAIZEIMPORT");
+                politics=result.getString("POLITICS");
+                beanprice=result.getString("BEANPRICE");
                 //for(int a=0; a<31;a ++){
                
-                     double d1 = (Double.parseDouble(riceprice) - minlevel) / 100000;
+                    double d1 = ((Double.parseDouble(riceprice) - minlevel)*0.001) / normolizer;
                //System.out.println("NORMALIZED "+d1 *normolizer + " REAL "+ riceprice);
-                double d2 = (Double.parseDouble(wheatprice) - minlevel) / 100000;
-                double d3 = (Double.parseDouble(maizeprice) - minlevel) / 100000;
+                double d2 = ((Double.parseDouble(wheatprice) - minlevel)*0.001) / normolizer;
+                double d3 = ((Double.parseDouble(maizeprice) - minlevel)*0.001) / normolizer;
                 double d4 = (Double.parseDouble(inflation) - minlevel) / 100;
                 double d5 = (Double.parseDouble(rainfall) - minlevel) / 1000;
-                double d6 = (Double.parseDouble(maizeproduction) - minlevel) / 100000;
+                double d6 = (Double.parseDouble(maizeproduction) - minlevel) / normolizer2;
+                double d7 = (Double.parseDouble(beanprice) - minlevel) / 100;
+                double d8 = (Double.parseDouble(data.getPolitics()) - minlevel);
+                double d9 = (Double.parseDouble(maizeimport) - minlevel) / normolizer3;
                
-                 System.out.print( "Actual"  + df2.format((d3*100000)));
+                  System.out.print( "Actual"  + df2.format((d3*normolizer)));
                  //testSet.addElement(new TrainingElement(new double[]{d1}));
-                 loadedMlPerceptron.setInput(d1,d2,d4,d5,d6);
+                 loadedMlPerceptron.setInput(d1,d2,d4,d5,d6,d7,d8,d9);
                   loadedMlPerceptron.calculate();
-                 System.out.print(" Predicted "+ df2.format((loadedMlPerceptron.getOutput().firstElement())*100000));
-                 updateCountryWide(df2.format((d3*100000)),df2.format((loadedMlPerceptron.getOutput().firstElement())*100000));
+                  System.out.print(" Predicted "+ df2.format((loadedMlPerceptron.getOutput().firstElement())*normolizer));
+                  error = ((loadedMlPerceptron.getOutput().firstElement())*normolizer)-(d3*normolizer);
+                  System.out.print(" Error "+ df2.format(error));
+                 /*updateCountryWide(df2.format((d3*normolizer)/0.001),
+                         df3.format((loadedMlPerceptron.getOutput().firstElement())*normolizer),df3.format(d3*normolizer));*/
                   //error =((loadedMlPerceptron.getOutput().firstElement())- (d5*normolizer)*normolizer);
-                  error = ((loadedMlPerceptron.getOutput().firstElement())*100000)-(d3*100000);
+                  //error = ((loadedMlPerceptron.getOutput().firstElement())*100000)-(d3*100000);
                  System.out.println(" Error "+ df2.format(error));
                  mad +=Math.abs(error);
                  error = Double.parseDouble(df2.format(error));
                  double actual = Double.parseDouble(df2.format(d3*normolizer));
-                 mape+=Math.abs(error/actual) *100;
-                 rmse += (error*error);
+                 mape1+=Math.abs(error/actual) *100;
+                 //rmse += (error*error);
+                 rmses.add((error*error));
+                 mapes.add(Math.abs(error/actual) *100);
                 // List output = null;
                  //call function to add errors to list
-                 results(df2.format((d3*100000)),
+                 results(df2.format((d3*normolizer)),
                          df2.format((loadedMlPerceptron.getOutput()
-                                 .firstElement())*100000),df2.format(error),String.valueOf(mape));
+                                 .firstElement())*normolizer),df2.format(error),String.valueOf(mape));
                       
                }   
             }
@@ -593,15 +625,32 @@ public class UsersController {
         }
       
               setRenedered("true");
-             sqrtrmse=sqrt((rmse/counter));
+            
+                 
+                 
+                 for(int i =0; i<rmses.size(); i++){
+                  //System.out.println("RMSE VALUES "+ rmses.get(i));
+                rmse+=Float.parseFloat(rmses.get(i).toString()); 
+              }
+              for(int i =0; i<mapes.size(); i++){
+                 
+                mape+=Double.parseDouble(mapes.get(i).toString()); 
+                
+              }
+              //System.out.println("MAPE SUM "+ mape); 
+             System.out.println(" Total RMSE COUNT  "+ rmses.size());
+             sqrtrmse=sqrt((rmse/rmses.size()));
               System.out.println(" Total RMSE  "+ df2.format(sqrtrmse));
-                 setRmse(String.valueOf(df2.format(sqrtrmse)));
+              
               mape = (mape/counter);
-              mad = (mad/counter);
-                 setMadresult(String.valueOf(df2.format(mad)));
-                 setMaperesult(String.valueOf(df2.format(mape)));
-              System.out.println(" MAD  "+ df2.format(mad));
-               System.out.println(" MAD  "+ df2.format(mape));
+              //System.out.println("Count "+ counter);
+              setMadresult(String.valueOf(df2.format(mad/counter)));
+              setMaperesult(String.valueOf(df2.format(mape)));
+              setRmse(df2.format(sqrtrmse));
+              System.out.println("Network  MAPE  "+ df2.format(mape));
+              System.out.println("Network  MAD  "+ df2.format(mad/counter));
+                 
+             
                setPredsDM(output);
                
                System.out.println("Final list count == > "+ output.size()); 
@@ -619,6 +668,80 @@ public class UsersController {
          return page;
     }
    
+    public String PredictMultivariate(){
+         ctx = FacesContext.getCurrentInstance();
+         rtx = RequestContext.getCurrentInstance();
+        String page = "dashboard.nnet";
+        String networsavedstatename="";
+         try{
+             loadModel = getModelDM().getRowData();
+                 System.out.println("This is the Max error "+ loadModel.getMaxiterations());
+                 double normolizer = loadModel.getNormalizer(); 
+            boolean numerals1 = isNumeric(data.getWheatprice());
+            boolean numerals2 = isNumeric(data.getRiceprice());
+            boolean numerals3 = isNumeric(data.getBeanprice());
+            boolean numerals4 = isNumeric(data.getMaizeimport());
+            boolean numerals5 = isNumeric(data.getMaizeproduction());
+            boolean numerals6 = isNumeric(data.getRainfall());
+            boolean numerals7 = isNumeric(data.getInflation());
+             if(numerals1 == false || numerals2 == false ||
+                     numerals3 == false || numerals4 == false
+                     || numerals5 == false || numerals6 == false
+                     || numerals7 == false){
+              // rtx.execute("PF('dlg4').hide()");
+              ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, 
+                            "All values should be double data type e.g 89.12", ""));   
+             }else{
+                
+              
+                    //Go ahead and predict
+                    if(data.getPolitics().equals("1")){
+                  networsavedstatename="kenyaPerceptron1.nnet";
+                }else if(data.getPolitics().equals("2")){
+                networsavedstatename="kenyaPerceptron2.nnet";  
+               }else{
+           networsavedstatename="kenyaPerceptron3.nnet";  
+                 }
+                    NeuralNetwork loadedMlPerceptron = NeuralNetwork.load(networsavedstatename);
+                    
+                  double d1 = ((Double.parseDouble(data.getRiceprice()) - minlevel)*0.001) / normolizer;
+               //System.out.println("NORMALIZED "+d1 *normolizer + " REAL "+ riceprice);
+                double d2 = ((Double.parseDouble(data.getWheatprice()) - minlevel)*0.001) / normolizer;
+               
+                double d4 = (Double.parseDouble(data.getInflation()) - minlevel) / 100;
+                double d5 = (Double.parseDouble(data.getInflation()) - minlevel) / 1000;
+                double d6 = (Double.parseDouble(data.getMaizeproduction()) - minlevel) / normolizer2;
+                double d7 = (Double.parseDouble(data.getBeanprice()) - minlevel) / 100;
+                double d8 = (Double.parseDouble(data.getPolitics()) - minlevel);
+                double d9 = (Double.parseDouble(data.getMaizeimport()) - minlevel) / normolizer3;
+                  loadedMlPerceptron.setInput(d1,d2,d4,d5,d6,d7,d8,d9);
+                  loadedMlPerceptron.calculate();
+                  System.out.print(" Predicted "+ df2.format((loadedMlPerceptron.getOutput().firstElement())*normolizer));
+                  
+                
+                 /*updateCountryWide(df2.format((d3*normolizer)/0.001),
+                         df3.format((loadedMlPerceptron.getOutput().firstElement())*normolizer),df3.format(d3*normolizer));*/
+                    setShowpredictedvalue("true");
+                    setPredictedvalue(String.valueOf(df3.format(((loadedMlPerceptron.getOutput().firstElement())/2)*normolizer)));
+                    
+                    //Do an update where that month = to that value
+                   // updatePredictions(month,selectedregion,predicted);
+                    ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                            "Success", ""));  
+                    rtx.execute("PF('dlg3').show()"); 
+               
+             }
+         }catch(Exception ex){
+              ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                            "Error occured", "")); 
+              ex.printStackTrace();
+         }
+        return page;
+    }
+    
+    public void resetMultivariate(){
+       data = new Research();  
+    }
     public String Predict(){
          ctx = FacesContext.getCurrentInstance();
          rtx = RequestContext.getCurrentInstance();
@@ -687,7 +810,6 @@ public class UsersController {
          }
         return page;
     }
-    
     
     
      public String UpdateHistoricalPrediction(){
@@ -952,6 +1074,36 @@ public class UsersController {
     }
 
     
+     public LineChartModel createLineRearchModels() {
+        System.out.println("I am here");
+        lineModel = new LineChartModel();
+      LineChartSeries s = new LineChartSeries();
+      LineChartSeries s2 = new LineChartSeries();
+      s.setLabel("Actual");
+      s2.setLabel("Predicted");
+      for(int i = 0; i<getResearchDM().size(); i++){
+          
+          s.set(i, Double.parseDouble(getResearchDM().get(i).getPriceinkg()));
+          s2.set(i, Double.parseDouble(getResearchDM().get(i).getPredictedvalue()));
+       
+      }
+     
+
+      lineModel.addSeries(s);
+      lineModel.addSeries(s2);
+      lineModel.setLegendPosition("e");
+      Axis y = lineModel.getAxis(AxisType.Y);
+      y.setMin(5);
+      y.setMax(50);
+      y.setLabel("Maize Price Kshs Per Kg");
+
+      Axis x = lineModel.getAxis(AxisType.X);
+      x.setMin(0);
+      x.setMax(getResearchDM().size());
+      x.setTickInterval("1");
+      x.setLabel("Duration From 1992 to 2017");
+      return lineModel;
+    }
     public String getRendergraph() {
         return rendergraph;
     }
@@ -1165,7 +1317,7 @@ public class UsersController {
     }
      public String bulkUpload(){
         ctx = FacesContext.getCurrentInstance();
-         String page = "bulkcreation.hub";
+         String page = "bulkcreation.nnet";
          
          FileInputStream fis = null;
          String id="";
@@ -1176,6 +1328,9 @@ public class UsersController {
          String maizeyield="";
          String precipitation="";
          String inflation="";
+         String politics = "";
+         String beanprice="";
+         String maizeimport = "";
          Date date = new Date();
           ctx = FacesContext.getCurrentInstance();
           rtx = RequestContext.getCurrentInstance();       
@@ -1298,7 +1453,40 @@ public class UsersController {
                             System.out.println("precipitation not "
                                     + "provided " + e.getMessage());
                         }
-                          
+                           
+                           try {
+                            maizeimport = row.getCell(7).toString();
+                            //Put into the fileInfo Array index 0
+                           data.setMaizeimport(maizeimport);
+                            System.out.println("Maize import \t"
+                                    + maizeimport + "\n");
+                        } catch (Exception e) {
+                            data.setRainfall("not provided");
+                            System.out.println("Maize import not "
+                                    + "provided " + e.getMessage());
+                        }
+                        try {
+                            politics = row.getCell(8).toString();
+                            //Put into the fileInfo Array index 0
+                           data.setPolitics(politics);
+                            System.out.println("politics \t"
+                                    + politics + "\n");
+                        } catch (Exception e) {
+                            data.setRainfall("not provided");
+                            System.out.println("politics not "
+                                    + "provided " + e.getMessage());
+                        }
+                         try {
+                            beanprice = row.getCell(9).toString();
+                            //Put into the fileInfo Array index 0
+                           data.setBeanprice(beanprice);
+                            System.out.println("Bean price \t"
+                                    + beanprice + "\n");
+                        } catch (Exception e) {
+                            data.setBeanprice("not provided");
+                            System.out.println("Bean price not "
+                                    + "provided " + e.getMessage());
+                        }
                        
                         dataFacade.create(data);
                         data = new Research();
@@ -1357,9 +1545,9 @@ public class UsersController {
         this.maperesult = maperesult;
     }
     
-    private void updateCountryWide(String actual, String predicted) {
+    private void updateCountryWide(String actual, String predicted,String priceinkg) {
        Statement stmt = null;
-       
+       //double priceinkg = Double.parseDouble(df2.format(actual))* 0.001;
       PreparedStatement preparedstatement = null;
        
        
@@ -1368,11 +1556,12 @@ public class UsersController {
          try{
             connection = GetDatabaseConnection.getMysqlConnection();
             stmt =  connection.createStatement();
-            String query ="UPDATE RESEARCH SET PREDICTEDVALUE = ? WHERE"
+            String query ="UPDATE RESEARCH SET PREDICTEDVALUE = ?, PRICEINKG = ? WHERE"
                     + " MAIZEPRICE = ?";
              preparedstatement = (PreparedStatement) connection.prepareStatement(query);
             preparedstatement.setString(1,predicted);
-            preparedstatement.setString(2,actual);
+            preparedstatement.setString(2,priceinkg);
+            preparedstatement.setString(3,actual);
            
             
             preparedstatement.execute();
@@ -1384,6 +1573,54 @@ public class UsersController {
         } 
         
     }
+
+    public String getSelectedmode() {
+        return selectedmode;
+    }
+
+    public void setSelectedmode(String selectedmode) {
+        this.selectedmode = selectedmode;
+    }
+
+    public String getMultirendered() {
+        return multirendered;
+    }
+
+    public void setMultirendered(String multirendered) {
+        this.multirendered = multirendered;
+    }
+
+    public String getUnirenedered() {
+        return unirenedered;
+    }
+
+    public void setUnirenedered(String unirenedered) {
+        this.unirenedered = unirenedered;
+    }
      
+     public void modeController(){
+         if(selectedmode.equals("0")){
+             setMultirendered("false");
+             setUnirenedered("false");
+         }else if(selectedmode.equals("uni")){
+             setUnirenedered("true");
+             setMultirendered("false");
+         }else if(selectedmode.equals("multi")){
+             setUnirenedered("false");
+             setMultirendered("true");
+         }
+     }
      
+      public static boolean isNumeric(String number){
+        
+        try{
+            
+          //int a = Integer.parseInt(id);
+           double a = Double.parseDouble(number);
+        }catch(Exception ex){
+            
+            return false;
+        }
+        return true;
+    }
 }

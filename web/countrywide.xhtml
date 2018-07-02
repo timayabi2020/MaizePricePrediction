@@ -36,10 +36,15 @@
                
                         
                     
-                          <p:tab title="ANN MODEL TRAINING">
+                          <p:tab title="ANN MODEL TRAINING (MULTIVARIATE MODE)">
                           
                               
-                            
+                            <h:outputLabel for="pols" value="Political Intervention *"/>
+                          <h:selectOneMenu id="pols" style="width: 250px" value="#{usersController.data.politics}"> 
+                              <f:selectItem itemLabel="Low" itemValue="1"/>
+                              <f:selectItem itemLabel="Medium" itemValue="2"/>
+                              <f:selectItem itemLabel="High" itemValue="3"/>   
+                        </h:selectOneMenu>
                               
     
                            
@@ -47,22 +52,23 @@
                           <br />
                           <h:panelGrid columns="1" id="table" rendered="#{usersController.renedered}">
                           <h:panelGrid  columns="4" cellpadding="5">
-                              <p:outputLabel value="Total network error = #{usersController.totalnetworkError}"/>
-                              <p:outputLabel value="RMSE = #{usersController.rmse}"/>
+                             <p:outputLabel value="Total network error = #{usersController.totalnetworkError}"/>
                               <p:outputLabel value="MAD  = #{usersController.madresult}"/>
+                              <p:outputLabel value="MAPE  = #{usersController.maperesult}"/>
+                              <p:outputLabel value="RMSE = #{usersController.rmse}"/>
                           </h:panelGrid>
                           
                           <br />
                           
-                          <p:outputLabel value="SELECTED TEST DATA RESULTS FOR THE WHOLE COUNTRY"/>
+                          <p:outputLabel value="SELECTED TEST DATA RESULTS IN MULTIVARIATE MODE"/>
                           <br />
                           
                           <br />
                           <p:dataTable value="#{usersController.predsDM}" var="model" id="results">
-            <p:column headerText="Actual maize price per tonne">
+            <p:column headerText="Actual maize price per kg">
                 <h:outputText value="Kshs #{model.actual}"/>
             </p:column>
-            <p:column headerText="Predicted maize price per tonne">
+            <p:column headerText="Predicted maize price per kg">
                 <h:outputText value=" Kshs #{model.predicted}"/>
             </p:column>
             

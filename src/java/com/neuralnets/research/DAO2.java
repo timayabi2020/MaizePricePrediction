@@ -31,7 +31,9 @@ import org.neuroph.nnet.learning.BackPropagation;
 public class DAO2 {
         private int maxCounter;
     private String[] valuesRow;
-     private double normolizer = 100000.0D;
+     private double normolizer = 100.0D;
+     private double normolizer2 = 100000.0D;
+     private double normolizer3 = 10000000.0D;
     private double minlevel = 0.0D;
     private TrainingSet trainingSet = new TrainingSet();
     public String[] getValuesRow() {
@@ -59,13 +61,16 @@ public class DAO2 {
     }
   
   
-    public TrainingSet readNRBData() {
+    public TrainingSet readNRBData(String politics) {
         
         String riceprice = "";
         String wheatprice="";
         String maizeprice="";
         String maizeproduction="";
         String rainfall="";
+        String beanprice="";
+        String maizeimport = "";
+        //String politics = "";
         String inflation ="";
         int rowcount = 0;
         HashMap hm = new HashMap();
@@ -81,7 +86,7 @@ public class DAO2 {
           
              connection = GetDatabaseConnection.getMysqlConnection();
             stmt =  connection.createStatement();
-            String query ="SELECT ID,MAIZEPRICE,INFLATION,MAIZEPRODUCTION,RAINFALL,RICEPRICE,WHEATPRICE FROM RESEARCH ORDER BY 1 DESC";
+            String query ="SELECT ID,MAIZEPRICE,INFLATION,MAIZEPRODUCTION,RAINFALL,RICEPRICE,WHEATPRICE,MAIZEIMPORT,BEANPRICE,POLITICS FROM RESEARCH ORDER BY 1 DESC";
              preparedstatement = (PreparedStatement) connection.prepareStatement(query);
            
            
@@ -104,19 +109,25 @@ public class DAO2 {
                 wheatprice=result.getString("WHEATPRICE");
                 maizeprice=result.getString("MAIZEPRICE");
                 id = String.valueOf(result.getInt("ID"));
+                maizeimport=result.getString("MAIZEIMPORT");
+                //politics=result.getString("POLITICS");
+                beanprice=result.getString("BEANPRICE");
                 //for(int a=0; a<31;a ++){
                
-                     double d1 = (Double.parseDouble(riceprice) - minlevel) / normolizer;
+                     double d1 = ((Double.parseDouble(riceprice) - minlevel)*0.001) / normolizer;
                //System.out.println("NORMALIZED "+d1 *normolizer + " REAL "+ riceprice);
-                double d2 = (Double.parseDouble(wheatprice) - minlevel) / normolizer;
-                double d3 = (Double.parseDouble(maizeprice) - minlevel) / normolizer;
+                double d2 = ((Double.parseDouble(wheatprice) - minlevel) *0.001) / normolizer;
+                double d3 = ((Double.parseDouble(maizeprice) - minlevel) *0.001) / normolizer;
                 double d4 = (Double.parseDouble(inflation) - minlevel) / 100;
                 double d5 = (Double.parseDouble(rainfall) - minlevel) / 1000;
-                double d6 = (Double.parseDouble(maizeproduction) - minlevel) / normolizer;
+                double d6 = (Double.parseDouble(maizeproduction) - minlevel) / normolizer2;
+                double d7 = (Double.parseDouble(beanprice) - minlevel) / 100;
+                double d8 = (Double.parseDouble(politics) - minlevel);
+                double d9 = (Double.parseDouble(maizeimport) - minlevel) / normolizer3;
                
                 //System.out.println(i + " " + d1 + " " + d2 + " " + d3 + " " + d4 + " ->" + d5);
                 //for(int k =0; k<6306; k++){
-                trainingSet.addElement(new SupervisedTrainingElement(new double[]{d1,d2,d4,d5,d6}, new double[]{d3}));  
+                trainingSet.addElement(new SupervisedTrainingElement(new double[]{d1,d2,d4,d5,d6,d7,d8,d9}, new double[]{d3}));  
                       
                }   
                   } 

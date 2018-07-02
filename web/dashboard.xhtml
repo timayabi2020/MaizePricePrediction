@@ -31,14 +31,93 @@
         <ui:define name="adminContent">
              <h:form id="regFRM">
             <p:messages style="width: 100%;" closable="true"/>
-           <h:panelGrid  columns="2" cellpadding="5">
+            <h:panelGrid  columns="1" cellpadding="5">
+             <p:selectOneMenu id="client" style="width: 250px" value="#{usersController.selectedmode}"> 
+                 <p:ajax listener="#{usersController.modeController()}" update="uni,multi,regFRM"/>     
+                              <f:selectItem  itemLabel="Select Mode" itemValue="0"/>
+                              <f:selectItem itemLabel="Multivariate" itemValue="multi"/>
+                              <f:selectItem itemLabel="Univariate" itemValue="uni"/>
+                                 
+                        </p:selectOneMenu>   
+            </h:panelGrid>
+            
+            <h:panelGrid  id="multi" columns="1" cellpadding="5" rendered="#{usersController.multirendered}">
+            <p:tabView dynamic="true" cache="true" >
+                            
+                <p:tab title="MULTIVARIATE MODE PREDICTIONS">
+                    <h:panelGrid  columns="4" cellpadding="5">
+                   <h:outputLabel for="pols" value="Political Intervention *"/>
+                          <h:selectOneMenu id="pols" style="width: 250px" value="#{usersController.data.politics}"> 
+                              <f:selectItem itemLabel="Low" itemValue="1"/>
+                              <f:selectItem itemLabel="Medium" itemValue="2"/>
+                              <f:selectItem itemLabel="High" itemValue="3"/>   
+                        </h:selectOneMenu>
+                    <h:outputLabel for="wheat" value="Wheat price(Kshs/kg) *"/>
+                    <p:inputText value="#{usersController.data.wheatprice}" required="true" id="wheat" type="number"/>
+                    <h:outputLabel for="rice" value="Rice price(Kshs/kg) *"/>
+                    <p:inputText value="#{usersController.data.riceprice}" required="true" id="rice" type="number"/>
+                    <h:outputLabel for="beans" value="Beans price(Kshs/kg) *"/>
+                    <p:inputText value="#{usersController.data.beanprice}" required="true" id="beans" type="number"/>
+                    <h:outputLabel for="maize" value="Imported maize quantity price(ton) *"/>
+                    <p:inputText value="#{usersController.data.maizeimport}" required="true" id="maize" type="number"/>
+                    <h:outputLabel for="maize2" value="Maize production quantity(ton) *"/>
+                    <p:inputText value="#{usersController.data.maizeproduction}" required="true" id="maize2" type="number"/>
+                    <h:outputLabel for="rainfall" value="Average rainfall(mm/year) *"/>
+                    <p:inputText value="#{usersController.data.rainfall}" required="true" id="rainfall" type="number"/>
+                    
+                    <h:outputLabel for="inflation" value="Inflation rate(yearly) *"/>
+                    <p:inputText value="#{usersController.data.inflation}" required="true" id="inflation" type="number"/>
+                    
+                    </h:panelGrid>
+                    
+                    <h:panelGrid columns="1">
+                            <p:commandLink styleClass="btn bg-green margin" action="#{usersController.PredictMultivariate()}" value="Predict"  update="regFRM,predictedvalmulti,multiresults,graph1" />
+                          
+                     
+                                    <p:outputLabel id="predictedvalmulti" value="Predicted Value #{usersController.predictedvalue}" rendered="#{usersController.showpredictedvalue}"/>
+                         
+                     </h:panelGrid>
+                     <h:panelGrid columns="1">
+                                  
+                                  <p:chart type="line" id="graph1" model="#{usersController.createLineRearchModels()}" style="height:400px;width:1000px"/> 
+                                  
+                                  <p:dataTable value="#{usersController.researchDM}" styleClass="fixed-size " var="model" id="multiresults" paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {Exporters}"
+                            paginator="true" rows="30" widgetVar="reportTable">
+                              <f:facet name="{Exporters}">
+            <h:commandLink>
+                <img src="images/excel.png" width="24"/>
+                <p:dataExporter type="xls" target="multiresults" fileName="Mutlivariate_predictions" />
+            </h:commandLink>
+ 
+            <h:commandLink>
+                <img src="images/pdf.png" width="24"/>
+                <p:dataExporter type="pdf" target="multiresults" fileName="Mutlivariate_predictions"/>
+            </h:commandLink>
+ 
+        </f:facet>        
+            <p:column headerText="Year">
+                <h:outputText value="#{model.year}"/>
+            </p:column>
+            <p:column headerText="Actual maize price per kg">
+                <h:outputText value="Kshs #{model.priceinkg}"/>
+            </p:column>
+            <p:column headerText="Predicted maize price per kg">
+                <h:outputText value=" Kshs #{model.predictedvalue}"/>
+            </p:column>
+            
+            
+            
+        </p:dataTable>
+                              </h:panelGrid>
+                </p:tab>
+            </p:tabView>
+            </h:panelGrid>
+           <h:panelGrid  id="uni" columns="2" cellpadding="5" rendered="#{usersController.unirenedered}">
               
                           <p:tabView dynamic="true" cache="true" >
                             
-                          <p:tab title="PREDICTIONS">
+                          <p:tab title="UNIVARIATE MODE (TIME SERIES) PREDICTIONS">
                                
-                        
-                                   
                        
                          <h:panelGrid  columns="5" cellpadding="5">
                              <h:outputLabel for="client" value="Select Region *"/>
@@ -119,6 +198,19 @@
   }
 </style>
              </h:form>
+             <h:panelGrid columns="1" cellpadding="5">
+                 <p:dialog widgetVar="dlg3" modal='true' height="100" width="350" style="background: #ffbe0c" showHeader="false" position="center center" onShow="PF('dlg3').initPosition()">
+                      <h:form>
+                          <h:panelGrid  columns="1" cellpadding="5">
+                     <p:outputLabel id="predictedvalmulti" value="Predicted value is Ksh #{usersController.predictedvalue} per kg" />
+                         
+                    
+                  
+                    <p:commandLink styleClass="btn bg-green margin" action="#{usersController.resetMultivariate()}" value="Close" onclick = "PF('dlg3').hide();" update="regFRM"/>
+                    </h:panelGrid> 
+                      </h:form>
+                     </p:dialog>
+             </h:panelGrid>
              <h:panelGrid columns="1" cellpadding="5">
                  <p:dialog widgetVar="dlg4" modal='true' height="200" width="100" style="background: #ffbe0c" showHeader="false" position="center center" onShow="PF('dl4').initPosition()">
                      

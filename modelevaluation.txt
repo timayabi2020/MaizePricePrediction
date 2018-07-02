@@ -149,22 +149,26 @@ Network  MAD  .968536
  Total RMSE  3.105996
  MAD  2.283457
  MAPE  7.685093
+ ACCURACY 96%
  
 1-month prediction
 ==================
  Total RMSE  2.848125
  MAD  1.963308
  MAPE  6.574432
+ ACCURACY 23%
  
 2-month prediction
 ==================
  Total RMSE  3.06253
  MAD  2.157568
  MAPE  7.214486
+ACCURACY 23%
+
 
 3-month prediction
 ==================
 Total RMSE  3.118647
 MAD  2.191664
 MAPE  7.320768 
-DETECTING CHANGE PERFROMANCE 8.904874
+ACCURACY 96%

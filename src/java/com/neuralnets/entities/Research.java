@@ -31,6 +31,10 @@ public class Research implements Serializable {
     private String maizeproduction;
     private String year;
     private String maizeprice;
+    private String beanprice;
+    private String politics;
+    private String maizeimport;
+    private String priceinkg;
 
     public Long getId() {
         return id;
@@ -137,6 +141,38 @@ public class Research implements Serializable {
 
     public void setMaizeprice(String maizeprice) {
         this.maizeprice = maizeprice;
+    }
+
+    public String getBeanprice() {
+        return beanprice;
+    }
+
+    public void setBeanprice(String beanprice) {
+        this.beanprice = beanprice;
+    }
+
+    public String getPolitics() {
+        return politics;
+    }
+
+    public void setPolitics(String politics) {
+        this.politics = politics;
+    }
+
+    public String getMaizeimport() {
+        return maizeimport;
+    }
+
+    public void setMaizeimport(String maizeimport) {
+        this.maizeimport = maizeimport;
+    }
+
+    public String getPriceinkg() {
+        return priceinkg;
+    }
+
+    public void setPriceinkg(String priceinkg) {
+        this.priceinkg = priceinkg;
     }
     
 }
