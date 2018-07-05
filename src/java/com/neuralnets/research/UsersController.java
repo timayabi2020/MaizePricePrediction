@@ -5,10 +5,14 @@
  */
 package com.neuralnets.research;
 
+import com.neuralnets.entities.Eldoret;
+import com.neuralnets.entities.Kisumu;
 import com.neuralnets.entities.Modelsettings;
 import com.neuralnets.entities.Nairobi;
 import com.neuralnets.entities.Research;
 import com.neuralnets.entities.Users;
+import com.neuralnets.facades.EldoretFacade;
+import com.neuralnets.facades.KisumuFacade;
 import com.neuralnets.facades.ModelsettingsFacade;
 import com.neuralnets.facades.NairobiFacade;
 import com.neuralnets.facades.ResearchFacade;
@@ -68,6 +72,8 @@ public class UsersController {
      private Users authUser = new Users();
      private Users loadUser = new Users();
      private Research data = new Research();
+      private Kisumu kisumu = new Kisumu();
+     private Eldoret eldoret = new Eldoret();
      private Modelsettings model = new Modelsettings();
       private Modelsettings loadModel = new Modelsettings();
       private double minlevel = 0.0D;
@@ -115,6 +121,12 @@ public class UsersController {
     
     @EJB
     private NairobiFacade nrbFacade = new NairobiFacade();
+    
+    @EJB
+    private KisumuFacade ksmFacade = new KisumuFacade();
+    
+    @EJB
+    private EldoretFacade eldFacade = new EldoretFacade();
      public String login(){
        
          ctx = FacesContext.getCurrentInstance();
@@ -1521,6 +1533,214 @@ public class UsersController {
         rtx.execute("PF('dlg1').hide();");
          return page;
      }
+     
+     
+     
+     
+     public String bulkUploadEld(){
+        ctx = FacesContext.getCurrentInstance();
+         String page = "bulkcreation.nnet";
+         
+         FileInputStream fis = null;
+         String data="";
+         String duration="";
+        
+         Date date = new Date();
+          ctx = FacesContext.getCurrentInstance();
+          rtx = RequestContext.getCurrentInstance();       
+        String[] fileInfo = {"0", "1"};
+        
+        //Set selected cours
+        //String selected = students.getSelectedcourse();
+         //setSelectedCourse(selected);
+       // rtx.execute("PF('dlg1').show();");
+              System.out.println(excelFile.getContentType());
+              if(excelFile==null || !excelFile.getContentType().equalsIgnoreCase("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")){
+               ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Wrong file format. Only xlsx files accepted",""));   
+              }else{
+        try(InputStream input = excelFile.getInputstream()){
+           
+            //First read 
+             //Finds the workbook instance for XLSX file
+                XSSFWorkbook myWorkBook = new XSSFWorkbook(input);
+                //Return first sheet from the XLSX workbook
+                
+                int numberOfSheets = myWorkBook.getNumberOfSheets();
+                for (int i = 0; i < numberOfSheets; i++) {
+                XSSFSheet mySheet = myWorkBook.getSheetAt(i);
+                Iterator<Row> rowIterator = mySheet.iterator();
+                //Traversing over each row of XLSX file
+                while (rowIterator.hasNext()) {
+                    Row row = rowIterator.next();
+
+                    //For each row, iterate through each columns
+                    Iterator<Cell> cellIterator = row.cellIterator();
+
+                    // The most important content
+                    if (row.getRowNum() <= 1) {
+                        continue; //just skip the rows if row number is 0 with titles
+                    } else {
+                        //get file details and set them
+                         try {
+                            duration = row.getCell(0).toString();
+                            //Put into the fileInfo Array index 0
+                            
+                            eldoret.setDate(duration);
+                            System.out.println("duration\t"
+                                    + duration + "\n");
+                        } catch (Exception e) {
+                           eldoret.setDate("not provided");
+                            System.out.println("duration not "
+                                    + "provided " + e.getMessage());
+                        }
+                         
+                         try {
+                            data = row.getCell(1).toString();
+                            //Put into the fileInfo Array index 0
+                            if(data==null || data.isEmpty()){
+                               eldoret.setData("20"); 
+                            }else{
+                            eldoret.setData(data);
+                            }
+                            System.out.println("Data\t"
+                                    + data + "\n");
+                            
+                            
+                        } catch (Exception e) {
+                             eldoret.setData("20");
+                            System.out.println("Data not "
+                                    + "provided " + e.getMessage());
+                        }
+
+                        
+                       
+                        eldFacade.create(eldoret);
+                        eldoret = new Eldoret();
+                        
+                        }
+                       // 
+                    
+                     
+                    }
+                   
+    
+                 }
+          ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "File details successfully uploaded",""));
+            
+        }catch(Exception ex){
+           ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "An error occured on file upload",""));
+           ex.printStackTrace();
+        }
+              }
+        rtx.execute("PF('dlg1').hide();");
+         return page;
+     }
+     
+     
+     public String bulkUploadKsm(){
+        ctx = FacesContext.getCurrentInstance();
+         String page = "bulkcreation.nnet";
+         
+         FileInputStream fis = null;
+         String data="";
+         String duration="";
+        
+         Date date = new Date();
+          ctx = FacesContext.getCurrentInstance();
+          rtx = RequestContext.getCurrentInstance();       
+        String[] fileInfo = {"0", "1"};
+        
+        //Set selected cours
+        //String selected = students.getSelectedcourse();
+         //setSelectedCourse(selected);
+       // rtx.execute("PF('dlg1').show();");
+              System.out.println(excelFile.getContentType());
+              if(excelFile==null || !excelFile.getContentType().equalsIgnoreCase("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")){
+               ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Wrong file format. Only xlsx files accepted",""));   
+              }else{
+        try(InputStream input = excelFile.getInputstream()){
+           
+            //First read 
+             //Finds the workbook instance for XLSX file
+                XSSFWorkbook myWorkBook = new XSSFWorkbook(input);
+                //Return first sheet from the XLSX workbook
+                
+                int numberOfSheets = myWorkBook.getNumberOfSheets();
+                for (int i = 0; i < numberOfSheets; i++) {
+                XSSFSheet mySheet = myWorkBook.getSheetAt(i);
+                Iterator<Row> rowIterator = mySheet.iterator();
+                //Traversing over each row of XLSX file
+                while (rowIterator.hasNext()) {
+                    Row row = rowIterator.next();
+
+                    //For each row, iterate through each columns
+                    Iterator<Cell> cellIterator = row.cellIterator();
+
+                    // The most important content
+                    if (row.getRowNum() <= 1) {
+                        continue; //just skip the rows if row number is 0 with titles
+                    } else {
+                        //get file details and set them
+                         try {
+                            duration = row.getCell(0).toString();
+                            //Put into the fileInfo Array index 0
+                            
+                            kisumu.setDate(duration);
+                            System.out.println("duration\t"
+                                    + duration + "\n");
+                        } catch (Exception e) {
+                           kisumu.setDate("not provided");
+                            System.out.println("duration not "
+                                    + "provided " + e.getMessage());
+                        }
+                         
+                         try {
+                            data = row.getCell(1).toString();
+                            //Put into the fileInfo Array index 0
+                            if(data==null || data.isEmpty()){
+                               kisumu.setData("20"); 
+                            }else{
+                            kisumu.setData(data);
+                            }
+                            System.out.println("Data\t"
+                                    + data + "\n");
+                            
+                            
+                        } catch (Exception e) {
+                             kisumu.setData("20");
+                            System.out.println("Data not "
+                                    + "provided " + e.getMessage());
+                        }
+
+                        
+                       
+                        ksmFacade.create(kisumu);
+                        kisumu = new Kisumu();
+                        
+                        }
+                       // 
+                    
+                     
+                    }
+                   
+    
+                 }
+          ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "File details successfully uploaded",""));
+            
+        }catch(Exception ex){
+           ctx.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "An error occured on file upload",""));
+           ex.printStackTrace();
+        }
+              }
+        rtx.execute("PF('dlg1').hide();");
+         return page;
+     }
 
     public UploadedFile getExcelFile() {
         return excelFile;
@@ -1633,4 +1853,21 @@ public class UsersController {
         }
         return true;
     }
+
+    public Kisumu getKisumu() {
+        return kisumu;
+    }
+
+    public void setKisumu(Kisumu kisumu) {
+        this.kisumu = kisumu;
+    }
+
+    public Eldoret getEldoret() {
+        return eldoret;
+    }
+
+    public void setEldoret(Eldoret eldoret) {
+        this.eldoret = eldoret;
+    }
+      
 }

@@ -47,7 +47,7 @@
                         <p:fileUpload value="#{usersController.excelFile}" id="upload" required="true" requiredMessage="Please upload sa file" mode="simple" skinSimple="true" allowTypes="/(\.|\/)(xlsx)$/"/>
                          </h:panelGrid> 
                       <h:panelGrid rendered="true"  style="position: relative;left:5%;" columns="2">
-                          <h:commandLink styleClass="btn bg-yellow margin" value="Save" style="position:relative;left:10%;"  onclick="PF('dlg1').show();" action="#{usersController.bulkUpload()}"  /> 
+                          <h:commandLink styleClass="btn bg-yellow margin" value="Save" style="position:relative;left:10%;"  onclick="PF('dlg1').show();" action="#{usersController.bulkUploadEld()}"  /> 
                         
                     </h:panelGrid> 
                                </p:tab>
